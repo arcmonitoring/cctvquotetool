@@ -2,7 +2,7 @@
   "_comment": "Arc Monitoring – CCTV Quote Tool Pricing Config. Edit via admin.html. All prices in GBP per year.",
   "lastUpdated": "2026-05-14",
   "updatedBy": "",
-  "_updateNotes": "Closed site now £90",
+  "_updateNotes": "Changing closed site back to £95",
   "monitoredCameras": {
     "t1": {
       "label": "1–2 cameras",
@@ -74,7 +74,7 @@
   "siteBoundary": {
     "closed": {
       "label": "Closed – Clear border",
-      "price": 90
+      "price": 95
     },
     "open": {
       "label": "Open – Arc discretion",
