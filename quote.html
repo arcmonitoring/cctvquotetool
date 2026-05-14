@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arc Monitoring – CCTV Quote Tool</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&display=swap');
+
+  :root {
+    --aqua: #58c3bb;
+    --aqua-dark: #3fa89f;
+    --aqua-light: #e8f9f8;
+    --grey: #8d9091;
+    --grey-light: #f5f6f6;
+    --grey-mid: #e0e2e2;
+    --dark: #2c3333;
+    --white: #ffffff;
+    --shadow: 0 2px 12px rgba(88,195,187,0.10);
+    --shadow-lg: 0 6px 30px rgba(88,195,187,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', Calibri, sans-serif;
+    background: #f0f7f7;
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--white);
+    border-bottom: 3px solid var(--aqua);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .header img { height: 52px; }
+  .header-title {
+    text-align: right;
+  }
+  .header-title h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--aqua);
+    letter-spacing: 0.5px;
+  }
+  .header-title p {
+    font-size: 14px;
+    color: var(--grey);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 20px 60px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    background: var(--aqua);
+    color: var(--white);
+    padding: 13px 22px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-header svg { flex-shrink: 0; }
+  .card-body { padding: 22px; }
+
+  /* FORM ELEMENTS */
+  .form-row {
+    margin-bottom: 16px;
+  }
+  .form-row:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 5px;
+  }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid var(--grey-mid);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--dark);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--aqua);
+    box-shadow: 0 0 0 3px rgba(88,195,187,0.15);
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238d9091' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+  }
+
+  /* TWO-COL GRID */
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* CUSTOMER TYPE TOGGLE */
+  .toggle-group {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid var(--grey-mid);
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .toggle-group label {
+    flex: 1;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--grey);
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+  }
+  .toggle-group input[type="radio"] { display: none; }
+  .toggle-group input:checked + label {
+    background: var(--aqua);
+    color: var(--white);
+  }
+  .toggle-group label:hover { background: var(--aqua-light); color: var(--aqua-dark); }
+  .toggle-group input:checked + label:hover { background: var(--aqua); color: var(--white); }
+
+  /* PRICE SUMMARY PANEL */
+  .summary-panel {
+    position: sticky;
+    top: 24px;
+  }
+  .summary-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: 2px solid var(--aqua);
+  }
+  .summary-header {
+    background: var(--aqua);
+    color: white;
+    padding: 16px 22px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .summary-body { padding: 18px 22px; }
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--grey-mid);
+    font-size: 13px;
+    gap: 10px;
+  }
+  .summary-line:last-of-type { border-bottom: none; }
+  .summary-line .label { color: var(--grey); flex: 1; }
+  .summary-line .val { font-weight: 700; color: var(--dark); white-space: nowrap; }
+  .summary-line.zero .val { color: var(--grey-mid); }
+
+  .total-block {
+    margin-top: 14px;
+    background: var(--aqua-light);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .total-block .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .total-block .total-row:last-child { margin-bottom: 0; }
+  .total-block .t-label { font-size: 12px; font-weight: 700; color: var(--grey); text-transform: uppercase; }
+  .total-block .t-val { font-size: 22px; font-weight: 700; color: var(--aqua-dark); }
+  .total-block .subtotal-val { font-size: 14px; color: var(--grey); text-decoration: line-through; }
+  .total-block .monthly-val { font-size: 13px; color: var(--grey); }
+  .discount-badge {
+    display: inline-block;
+    background: var(--aqua);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+
+  /* GENERATE BUTTON */
+  .btn-generate {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--aqua);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-generate:hover { background: var(--aqua-dark); }
+  .btn-generate:active { transform: scale(0.98); }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--aqua);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--aqua-light);
+  }
+
+  /* PRICING ADMIN SECTION */
+  /* TEMPLATES */
+  .btn-save-template {
+    padding: 10px 18px;
+    background: var(--aqua);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-save-template:hover { background: var(--aqua-dark); }
+  .template-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: var(--grey-light);
+    border-radius: 7px;
+    margin-bottom: 7px;
+    border: 1.5px solid var(--grey-mid);
+    transition: border-color 0.15s;
+  }
+  .template-item:hover { border-color: var(--aqua); }
+  .template-item .t-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .btn-load {
+    padding: 4px 12px;
+    background: var(--aqua);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-load:hover { background: var(--aqua-dark); }
+  .btn-delete {
+    padding: 4px 8px;
+    background: none;
+    color: var(--grey);
+    border: 1.5px solid var(--grey-mid);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .btn-delete:hover { background: #fdf0f0; border-color: #e05555; color: #e05555; }
+  .no-templates {
+    font-size: 13px;
+    color: var(--grey);
+    font-style: italic;
+    padding: 6px 0 2px;
+  }
+  .btn-templates-toggle {
+    width: 100%;
+    margin-top: 10px;
+    padding: 9px 13px;
+    background: var(--grey-light);
+    color: var(--grey);
+    border: 1.5px solid var(--grey-mid);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-templates-toggle:hover {
+    border-color: var(--aqua);
+    color: var(--aqua-dark);
+    background: var(--aqua-light);
+  }
+  .btn-templates-toggle.open {
+    border-color: var(--aqua);
+    color: var(--aqua-dark);
+    background: var(--aqua-light);
+  }
+  #templatesPanelBody, #contactsPanelBody {
+    background: var(--grey-light);
+    border: 1.5px solid var(--grey-mid);
+    border-top: none;
+    border-radius: 0 0 7px 7px;
+    padding: 12px;
+  }
+
+  .admin-toggle {
+    display: block;
+    text-align: center;
+    color: var(--grey);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px;
+    text-decoration: underline;
+    letter-spacing: 0.3px;
+  }
+  .admin-section { display: none; }
+  .admin-section.open { display: block; }
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .price-table th {
+    background: var(--grey-light);
+    color: var(--grey);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--grey-mid);
+  }
+  .price-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--grey-mid);
+    vertical-align: middle;
+  }
+  .price-table tr:last-child td { border-bottom: none; }
+  .price-table input[type="number"] {
+    width: 80px;
+    padding: 4px 7px;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  /* MANDATORY FIELD VALIDATION */
+  .field-error input, .field-error select {
+    border-color: #e05555;
+    box-shadow: 0 0 0 3px rgba(224,85,85,0.12);
+  }
+  .field-error label { color: #e05555; }
+  .field-error label::after { content: ' *'; color: #e05555; }
+  .error-msg {
+    font-size: 11px;
+    color: #e05555;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+  .validation-banner {
+    background: #fdf0f0;
+    border: 1.5px solid #e05555;
+    border-radius: 7px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #c03030;
+    font-weight: 600;
+    display: none;
+  }
+
+  /* CELEBRATION BURST */
+  .emoji-burst {
+    position: fixed;
+    pointer-events: none;
+    font-size: 24px;
+    user-select: none;
+    z-index: 9999;
+    animation: emojiFly 0.9s ease-out forwards;
+  }
+  @keyframes emojiFly {
+    0%   { transform: translate(0,0) scale(1);   opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; }
+  }
+
+  /* PRINT / PDF STYLES */
+  @media print {
+    body { background: white; }
+    .container { display: block; }
+    .summary-panel, .admin-toggle, .admin-section, .btn-generate, .card:not(.print-card) { display: none !important; }
+    .print-card { display: block !important; }
+  }
+
+  /* QUOTE PREVIEW (hidden, used for PDF generation) */
+  #quote-preview { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img style="height:70px;" src="data:image/jpeg;base64,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" alt="Arc Monitoring">
+  <div class="header-title">
+    <h1>CCTV Quote Tool</h1>
+    <p>Connect with us</p>
+
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- LEFT: FORM COLUMN -->
+  <div class="form-column">
+
+    <!-- QUOTE & CUSTOMER DETAILS -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Quote & Customer Details
+      </div>
+      <div class="card-body">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Quote Reference</label>
+            <div style="display:flex;align-items:center;border:1.5px solid var(--grey-mid);border-radius:7px;overflow:hidden;transition:box-shadow 0.2s;" id="quoteRefWrapper">
+              <span id="quoteRefPrefix" style="background:var(--grey-light);color:var(--grey);font-size:13px;padding:10px 11px;border-right:1.5px solid var(--grey-mid);white-space:nowrap;font-weight:600;"></span>
+              <input type="number" id="quoteRefSuffix" min="1" placeholder="001" oninput="updateSummary()" style="border:none;border-radius:0;flex:1;min-width:0;width:70px;padding:10px 11px;" onfocus="document.getElementById('quoteRefWrapper').style.boxShadow='0 0 0 3px rgba(88,195,187,0.15)';document.getElementById('quoteRefWrapper').style.borderColor='var(--aqua)'" onblur="document.getElementById('quoteRefWrapper').style.boxShadow='';document.getElementById('quoteRefWrapper').style.borderColor='var(--grey-mid)'">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Quote Date</label>
+            <input type="text" id="quoteDate" oninput="updateSummary()">
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:6px;">
+          <label>Customer Type</label>
+          <div class="toggle-group">
+            <input type="radio" name="custType" id="typeInstaller" value="installer" checked>
+            <label for="typeInstaller">Installer</label>
+            <input type="radio" name="custType" id="typeEndUser" value="enduser">
+            <label for="typeEndUser">End User</label>
+          </div>
+        </div>
+
+        <div class="section-divider">Customer Information</div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Name</label>
+            <input type="text" id="custName" placeholder="Contact name" oninput="updateSummary()">
+          </div>
+          <div class="form-row">
+            <label>Company Name</label>
+            <input type="text" id="custCompany" placeholder="Company" oninput="updateSummary()">
+          </div>
+          <div class="form-row">
+            <label>Email Address</label>
+            <input type="email" id="custEmail" placeholder="email@company.com">
+          </div>
+          <div class="form-row">
+            <label>Phone Number</label>
+            <input type="tel" id="custPhone" placeholder="+44...">
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Preferred Billing Frequency</label>
+          <select id="billingFreq">
+            <option value="Annually">Annually</option>
+            <option value="Monthly">Monthly (Direct Debit)</option>
+            <option value="Quarterly">Quarterly (Direct Debit)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- SITE CONFIGURATION -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Site Configuration
+      </div>
+      <div class="card-body">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Site Type</label>
+            <select id="siteType" onchange="updateSummary()">
+              <option value="Permanent">Permanent</option>
+              <option value="Temporary">Temporary</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Site Boundary Status</label>
+            <select id="siteBoundary" onchange="updateSummary()">
+              <option value="" data-cost="0">Please select...</option>
+              <option value="Closed - Clear border, all human activity escalated" data-cost="95">Closed – Clear border (£95)</option>
+              <option value="Open - Arc to use discretion" data-cost="155">Open – Arc discretion (£155)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Monitored Cameras</label>
+            <input type="number" id="monCameras" value="0" min="0" max="398" oninput="updateSummary()">
+          </div>
+          <div class="form-row">
+            <label>View Only Cameras</label>
+            <input type="number" id="viewCameras" value="0" min="0" max="200" oninput="updateSummary()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="card">
+      <div class="card-header">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Services &amp; Options
+      </div>
+      <div class="card-body">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Arm &amp; Disarm</label>
+            <select id="armDisarm" onchange="updateSummary()">
+              <option value="" data-cost="0">Please select...</option>
+              <option value="Phone Call" data-cost="260">Phone Call (£260)</option>
+              <option value="Schedule" data-cost="260">Schedule (£260)</option>
+              <option value="Site Arm and Disarm via panel, switch, alarm system" data-cost="0">Via Panel / Switch / Alarm (£0)</option>
+              <option value="Site Arm and Disarm via NVR Schedule - not recommended" data-cost="0">Via NVR Schedule (£0)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Audio</label>
+            <select id="audio" onchange="updateSummary()">
+              <option value="No Audio" data-cost="0">No Audio (£0)</option>
+              <option value="Main Site Audio" data-cost="0">Main Site Audio (£0)</option>
+              <option value="2 Audio Points" data-cost="29.5">2 Points (£29.50)</option>
+              <option value="3 Audio Points" data-cost="44.25">3 Points (£44.25)</option>
+              <option value="4 Audio Points" data-cost="59">4 Points (£59)</option>
+              <option value="5 Audio Points" data-cost="73.75">5 Points (£73.75)</option>
+              <option value="6 Audio Points" data-cost="58.5">6 Points (£58.50)</option>
+              <option value="7 Audio Points" data-cost="68.25">7 Points (£68.25)</option>
+              <option value="8 Audio Points" data-cost="78">8 Points (£78)</option>
+              <option value="9 Audio Points" data-cost="87.75">9 Points (£87.75)</option>
+              <option value="10 Audio Points" data-cost="97.5">10 Points (£97.50)</option>
+              <option value="11 Audio Points" data-cost="82.5">11 Points (£82.50)</option>
+              <option value="12 Audio Points" data-cost="90">12 Points (£90)</option>
+              <option value="13 Audio Points" data-cost="97.5">13 Points (£97.50)</option>
+              <option value="14 Audio Points" data-cost="105">14 Points (£105)</option>
+              <option value="15 Audio Points" data-cost="112.5">15 Points (£112.50)</option>
+              <option value="16 Audio Points" data-cost="120">16 Points (£120)</option>
+              <option value="20 Audio Points" data-cost="150">20 Points (£150)</option>
+              <option value="30 Audio Points" data-cost="150">30 Points (£150)</option>
+              <option value="32 Audio Points" data-cost="160">32 Points (£160)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-divider">Additional Services</div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>E-Patrols</label>
+            <select id="epatrols" onchange="updateSummary()">
+              <option value="Not Required" data-cost="0">Not Required</option>
+              <optgroup label="Up to 10 Cameras">
+                <option value="1 per day up to 10 cameras" data-cost="3.95">1/day – up to 10 cams (£3.95/day)</option>
+                <option value="2 per day up to 10 cameras" data-cost="7.9">2/day – up to 10 cams (£7.90/day)</option>
+                <option value="3 per day up to 10 cameras" data-cost="11.85">3/day – up to 10 cams (£11.85/day)</option>
+                <option value="4 per day up to 10 cameras" data-cost="15.8">4/day – up to 10 cams (£15.80/day)</option>
+                <option value="5 per day up to 10 cameras" data-cost="19.75">5/day – up to 10 cams (£19.75/day)</option>
+              </optgroup>
+              <optgroup label="Up to 20 Cameras">
+                <option value="1 per day up to 20 Cameras" data-cost="6.4">1/day – up to 20 cams (£6.40/day)</option>
+                <option value="2 per day up to 20 Cameras" data-cost="12.8">2/day – up to 20 cams (£12.80/day)</option>
+                <option value="3 per day up to 20 Cameras" data-cost="19.2">3/day – up to 20 cams (£19.20/day)</option>
+                <option value="4 per day up to 20 Cameras" data-cost="25.6">4/day – up to 20 cams (£25.60/day)</option>
+                <option value="5 per day up to 20 Cameras" data-cost="32">5/day – up to 20 cams (£32.00/day)</option>
+              </optgroup>
+              <optgroup label="Up to 30 Cameras">
+                <option value="1 per day up to 30 Cameras" data-cost="8.85">1/day – up to 30 cams (£8.85/day)</option>
+                <option value="2 per day up to 30 Cameras" data-cost="17.7">2/day – up to 30 cams (£17.70/day)</option>
+                <option value="3 per day up to 30 Cameras" data-cost="26.55">3/day – up to 30 cams (£26.55/day)</option>
+                <option value="4 per day up to 30 Cameras" data-cost="35.4">4/day – up to 30 cams (£35.40/day)</option>
+                <option value="5 per day up to 30 Cameras" data-cost="44.25">5/day – up to 30 cams (£44.25/day)</option>
+              </optgroup>
+              <optgroup label="Up to 40 Cameras">
+                <option value="1 per day up to 40 Cameras" data-cost="11.3">1/day – up to 40 cams (£11.30/day)</option>
+                <option value="2 per day up to 40 Cameras" data-cost="22.6">2/day – up to 40 cams (£22.60/day)</option>
+                <option value="3 per day up to 40 Cameras" data-cost="33.9">3/day – up to 40 cams (£33.90/day)</option>
+                <option value="4 per day up to 40 Cameras" data-cost="45.2">4/day – up to 40 cams (£45.20/day)</option>
+                <option value="5 per day up to 40 Cameras" data-cost="56.5">5/day – up to 40 cams (£56.50/day)</option>
+              </optgroup>
+              <optgroup label="Up to 50 Cameras">
+                <option value="1 per day up to 50 Cameras" data-cost="12.75">1/day – up to 50 cams (£12.75/day)</option>
+                <option value="2 per day up to 50 Cameras" data-cost="25.5">2/day – up to 50 cams (£25.50/day)</option>
+                <option value="3 per day up to 50 Cameras" data-cost="38.25">3/day – up to 50 cams (£38.25/day)</option>
+                <option value="4 per day up to 50 Cameras" data-cost="51">4/day – up to 50 cams (£51.00/day)</option>
+                <option value="5 per day up to 50 Cameras" data-cost="63.75">5/day – up to 50 cams (£63.75/day)</option>
+              </optgroup>
+              <optgroup label="Up to 60 Cameras">
+                <option value="1 per day up to 60 Cameras" data-cost="14.2">1/day – up to 60 cams (£14.20/day)</option>
+                <option value="2 per day up to 60 Cameras" data-cost="28.4">2/day – up to 60 cams (£28.40/day)</option>
+                <option value="3 per day up to 60 Cameras" data-cost="42.6">3/day – up to 60 cams (£42.60/day)</option>
+                <option value="4 per day up to 60 Cameras" data-cost="56.8">4/day – up to 60 cams (£56.80/day)</option>
+                <option value="5 per day up to 60 Cameras" data-cost="71">5/day – up to 60 cams (£71.00/day)</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>AI Alarm Filtering</label>
+            <select id="ai" onchange="updateSummary()">
+              <option value="Not Required" data-cost="0">Not Required</option>
+              <option value="AI for up to 5 Cameras" data-cost="180">Up to 5 Cameras (£180/yr)</option>
+              <option value="AI for up to 10 Cameras" data-cost="360">Up to 10 Cameras (£360/yr)</option>
+              <option value="AI for up to 15 Cameras" data-cost="540">Up to 15 Cameras (£540/yr)</option>
+              <option value="AI for Up to 20 Cameras" data-cost="720">Up to 20 Cameras (£720/yr)</option>
+              <option value="AI for Up to 25 Cameras" data-cost="900">Up to 25 Cameras (£900/yr)</option>
+              <option value="AI for Up to 30 Cameras" data-cost="1080">Up to 30 Cameras (£1,080/yr)</option>
+              <option value="AI for Up to 40 Cameras" data-cost="1440">Up to 40 Cameras (£1,440/yr)</option>
+              <option value="AI for Up to 50 Cameras" data-cost="1800">Up to 50 Cameras (£1,800/yr)</option>
+              <option value="AI for Up to 60 Cameras" data-cost="2160">Up to 60 Cameras (£2,160/yr)</option>
+              <option value="AI for Up to 70 Cameras" data-cost="2520">Up to 70 Cameras (£2,520/yr)</option>
+              <option value="AI for Up to 80 Cameras" data-cost="2880">Up to 80 Cameras (£2,880/yr)</option>
+              <option value="AI for Up to 90 Cameras" data-cost="3240">Up to 90 Cameras (£3,240/yr)</option>
+              <option value="AI for Up to 100 Cameras" data-cost="3600">Up to 100 Cameras (£3,600/yr)</option>
+              <option value="AI for Up to 110 Cameras" data-cost="3960">Up to 110 Cameras (£3,960/yr)</option>
+              <option value="AI for Up to 120 Cameras" data-cost="4320">Up to 120 Cameras (£4,320/yr)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Specific Alarm Scripting</label>
+            <select id="scripting" onchange="updateSummary()">
+              <option value="Not Required" data-cost="0">Not Required</option>
+              <option value="Script for up to 16 Cameras" data-cost="295">Up to 16 Cameras (£295)</option>
+              <option value="Script for up to 32 Cameras" data-cost="495">Up to 32 Cameras (£495)</option>
+              <option value="Script for over 33 Cameras" data-cost="595">Over 33 Cameras (£595)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Temperature / Fire Monitoring</label>
+            <select id="tempFire" onchange="updateSummary()">
+              <option value="Not Required" data-cost="0">Not Required</option>
+              <option value="Temperature monitoring up to 5 Cameras" data-cost="120">Up to 5 Cameras (£120)</option>
+              <option value="Temperature monitoring up to 10 Cameras" data-cost="240">Up to 10 Cameras (£240)</option>
+              <option value="Temperature monitoring up to 15 Cameras" data-cost="340">Up to 15 Cameras (£340)</option>
+              <option value="Temperature monitoring up to 20 Cameras" data-cost="400">Up to 20 Cameras (£400)</option>
+              <option value="Temperature monitoring up to 25 Cameras" data-cost="500">Up to 25 Cameras (£500)</option>
+              <option value="Temperature monitoring up to 30 Cameras" data-cost="550">Up to 30 Cameras (£550)</option>
+              <option value="Temperature monitoring up to 35 Cameras" data-cost="600">Up to 35 Cameras (£600)</option>
+              <option value="Temperature monitoring up to 40 Cameras" data-cost="650">Up to 40 Cameras (£650)</option>
+              <option value="Temperature monitoring up to 45 Cameras" data-cost="700">Up to 45 Cameras (£700)</option>
+              <option value="Temperature monitoring up to 50 Cameras" data-cost="750">Up to 50 Cameras (£750)</option>
+              <option value="Temperature monitoring up to 55 Cameras" data-cost="800">Up to 55 Cameras (£800)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-divider">Reporting</div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Reporting Option 1</label>
+            <select id="report1" onchange="updateSummary()">
+              <option value="Daily Site Activity Reporting" data-cost="0">Daily Site Activity (£0)</option>
+              <option value="No Additional Reporting" data-cost="0">No Additional Reporting</option>
+              <option value="Weekly Site Activity Reporting" data-cost="100">Weekly Site Activity (£100)</option>
+              <option value="Check My CCTV" data-cost="100">Check My CCTV (£100)</option>
+              <option value="Monthly Site Activity Reporting" data-cost="50">Monthly Site Activity (£50)</option>
+              <option value="Weekly Call Logging Report" data-cost="500">Weekly Call Logging (£500)</option>
+              <option value="Monthly Call Logging Report" data-cost="300">Monthly Call Logging (£300)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Reporting Option 2</label>
+            <select id="report2" onchange="updateSummary()">
+              <option value="No Additional Reporting" data-cost="0">No Additional Reporting</option>
+              <option value="Daily Site Activity Reporting" data-cost="0">Daily Site Activity (£0)</option>
+              <option value="Weekly Site Activity Reporting" data-cost="100">Weekly Site Activity (£100)</option>
+              <option value="Check My CCTV" data-cost="100">Check My CCTV (£100)</option>
+              <option value="Monthly Site Activity Reporting" data-cost="50">Monthly Site Activity (£50)</option>
+              <option value="Weekly Call Logging Report" data-cost="500">Weekly Call Logging (£500)</option>
+              <option value="Monthly Call Logging Report" data-cost="300">Monthly Call Logging (£300)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Reporting Option 3</label>
+            <select id="report3" onchange="updateSummary()">
+              <option value="No Additional Reporting" data-cost="0">No Additional Reporting</option>
+              <option value="Daily Site Activity Reporting" data-cost="0">Daily Site Activity (£0)</option>
+              <option value="Weekly Site Activity Reporting" data-cost="100">Weekly Site Activity (£100)</option>
+              <option value="Check My CCTV" data-cost="100">Check My CCTV (£100)</option>
+              <option value="Monthly Site Activity Reporting" data-cost="50">Monthly Site Activity (£50)</option>
+              <option value="Weekly Call Logging Report" data-cost="500">Weekly Call Logging (£500)</option>
+              <option value="Monthly Call Logging Report" data-cost="300">Monthly Call Logging (£300)</option>
+            </select>
+          </div>
+          <!-- DISCOUNT / LOGO SWAP -->
+          <div class="form-row" id="discountSlot" style="min-height:44px;">
+            <div id="discountLogoPlaceholder" style="display:flex;align-items:center;justify-content:center;padding:6px 0;">
+              <img src="data:image/jpeg;base64,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" alt="" ondblclick="showDiscount(event)" style="height:28px;opacity:0.35;cursor:default;user-select:none;-webkit-user-select:none;" draggable="false">
+            </div>
+            <div id="discountRow-form" style="display:none;width:100%;">
+              <label style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                <span>Discount</span>
+                <span ondblclick="hideDiscount()" style="font-size:10px;color:var(--grey-mid);cursor:default;font-weight:400;user-select:none;">✕ hide</span>
+              </label>
+              <select id="discount" onchange="updateSummary()">
+                <option value="0">No Discount</option>
+                <option value="0.05">5%</option>
+                <option value="0.1">10%</option>
+                <option value="0.15">15%</option>
+                <option value="0.2">20%</option>
+                <option value="0.25">25%</option>
+                <option value="0.35">35%</option>
+                <option value="0.4">40%</option>
+                <option value="0.5">50%</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING ADMIN -->
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span class="admin-toggle" onclick="toggleAdmin()">⚙ One-time price table edit</span>
+      <a href="admin.html" style="font-size:12px;color:var(--grey);font-weight:600;text-decoration:underline;">Pricing Admin →</a>
+    </div>
+    <div class="admin-section card" id="adminSection">
+      <div class="card-header">Pricing Administration</div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--grey);margin-bottom:14px;">Update these values to change base prices. Changes apply immediately to the quote calculator.</p>
+        <table class="price-table">
+          <thead><tr><th>Camera Tier (Monitored)</th><th>Range</th><th>£/Camera/yr</th></tr></thead>
+          <tbody>
+            <tr><td>Tier 1</td><td>1–2 cams</td><td><input type="number" id="p_mon_t1" value="150" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 2</td><td>3–5 cams</td><td><input type="number" id="p_mon_t2" value="125" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 3</td><td>6–10 cams</td><td><input type="number" id="p_mon_t3" value="100" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 4</td><td>11–19 cams</td><td><input type="number" id="p_mon_t4" value="90" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 5</td><td>20–29 cams</td><td><input type="number" id="p_mon_t5" value="80" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 6</td><td>30–39 cams</td><td><input type="number" id="p_mon_t6" value="60" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 7</td><td>40–100 cams</td><td><input type="number" id="p_mon_t7" value="50" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 8</td><td>101–150 cams</td><td><input type="number" id="p_mon_t8" value="40" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 9</td><td>151–200 cams</td><td><input type="number" id="p_mon_t9" value="30" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 10</td><td>201–250 cams</td><td><input type="number" id="p_mon_t10" value="20" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 11</td><td>251+ cams</td><td><input type="number" id="p_mon_t11" value="10" oninput="updateSummary()"></td></tr>
+          </tbody>
+        </table>
+        <table class="price-table" style="margin-top:16px;">
+          <thead><tr><th>Camera Tier (View Only)</th><th>Range</th><th>£/Camera/yr</th></tr></thead>
+          <tbody>
+            <tr><td>Tier 1</td><td>1 cam</td><td><input type="number" id="p_view_t1" value="50" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 2</td><td>2–3 cams</td><td><input type="number" id="p_view_t2" value="40" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 3</td><td>4–5 cams</td><td><input type="number" id="p_view_t3" value="35" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 4</td><td>6–7 cams</td><td><input type="number" id="p_view_t4" value="30" oninput="updateSummary()"></td></tr>
+            <tr><td>Tier 5</td><td>8+ cams</td><td><input type="number" id="p_view_t5" value="25" oninput="updateSummary()"></td></tr>
+          </tbody>
+        </table>
+        <table class="price-table" style="margin-top:16px;">
+          <thead><tr><th>Site Boundary</th><th>£/yr</th></tr></thead>
+          <tbody>
+            <tr><td>Closed – Clear border</td><td><input type="number" id="p_closed" value="95" oninput="updateSummary();updateBoundaryOptions()"></td></tr>
+            <tr><td>Open – Arc discretion</td><td><input type="number" id="p_open" value="155" oninput="updateSummary();updateBoundaryOptions()"></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end form-column -->
+
+  <!-- RIGHT: SUMMARY PANEL -->
+  <div class="summary-panel">
+    <div class="summary-card">
+      <div class="summary-header">Live Quote Summary</div>
+      <div class="summary-body">
+
+        <div id="summaryLines"></div>
+
+        <div class="total-block">
+          <div class="total-row">
+            <span class="t-label">Sub Total</span>
+            <span class="subtotal-val" id="totalSubtotal">£0.00</span>
+          </div>
+          <div class="total-row" id="discountRow" style="display:none">
+            <span class="t-label">Discount <span class="discount-badge" id="discountBadge"></span></span>
+            <span class="t-label" id="discountAmount" style="color:var(--aqua-dark);font-weight:700;"></span>
+          </div>
+          <div class="total-row">
+            <span class="t-label">Annual Total (ex VAT)</span>
+            <span class="t-val" id="totalFinal">£0.00</span>
+          </div>
+          <div class="total-row">
+            <span class="t-label" style="font-size:11px;">Monthly equivalent</span>
+            <span class="monthly-val" id="totalMonthly">£0.00/mo</span>
+          </div>
+        </div>
+
+        <div class="validation-banner" id="validationBanner">
+          Please fill in all required fields: Name, Company Name, and Email Address.
+        </div>
+        <button class="btn-generate" onclick="generatePDF()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Generate Quote PDF
+        </button>
+
+        <!-- COLLAPSIBLE TEMPLATES -->
+        <button class="btn-templates-toggle" onclick="toggleTemplatesPanel()" id="templatesPanelToggle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Saved Templates
+          <span id="templatesPanelArrow" style="margin-left:auto;transition:transform 0.2s;">▾</span>
+        </button>
+        <div id="templatesPanelBody" style="display:none;margin-top:2px;">
+          <div id="templatesList" style="margin-bottom:10px;"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <div style="flex:1;">
+              <label style="font-size:11px;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;display:block;">Save current config as</label>
+              <input type="text" id="templateName" placeholder="e.g. 12 cam closed site" maxlength="60" style="font-size:13px;padding:8px 10px;">
+            </div>
+            <button class="btn-save-template" onclick="saveTemplate()">Save</button>
+          </div>
+          <div id="templateMsg" style="font-size:11px;margin-top:6px;color:var(--aqua-dark);font-weight:600;display:none;"></div>
+        </div>
+
+        <!-- COLLAPSIBLE CONTACTS -->
+        <button class="btn-templates-toggle" onclick="toggleContactsPanel()" id="contactsPanelToggle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Saved Contacts
+          <span id="contactsPanelArrow" style="margin-left:auto;transition:transform 0.2s;">▾</span>
+        </button>
+        <div id="contactsPanelBody" style="display:none;margin-top:2px;">
+          <div id="contactsList" style="margin-bottom:10px;"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <div style="flex:1;">
+              <label style="font-size:11px;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;display:block;">Save current customer as</label>
+              <input type="text" id="contactSaveName" placeholder="e.g. Acme Ltd" maxlength="60" style="font-size:13px;padding:8px 10px;">
+            </div>
+            <button class="btn-save-template" onclick="saveContact()">Save</button>
+          </div>
+          <div id="contactMsg" style="font-size:11px;margin-top:6px;color:var(--aqua-dark);font-weight:600;display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- HIDDEN PDF CONTENT -->
+<div id="quote-preview"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+// ─── PRICING TABLES ─────────────────────────────────────────────────────────
+
+function getMonitoredCameraPrice(n) {
+  if (n <= 0) return 0;
+  const tiers = [
+    { max: 2, field: 'p_mon_t1' },
+    { max: 5, field: 'p_mon_t2' },
+    { max: 10, field: 'p_mon_t3' },
+    { max: 19, field: 'p_mon_t4' },
+    { max: 29, field: 'p_mon_t5' },
+    { max: 39, field: 'p_mon_t6' },
+    { max: 100, field: 'p_mon_t7' },
+    { max: 150, field: 'p_mon_t8' },
+    { max: 200, field: 'p_mon_t9' },
+    { max: 250, field: 'p_mon_t10' },
+    { max: Infinity, field: 'p_mon_t11' }
+  ];
+  let total = 0, remaining = n;
+  const breaks = [0, 2, 5, 10, 19, 29, 39, 100, 150, 200, 250];
+  for (let i = 0; i < tiers.length && remaining > 0; i++) {
+    const tierStart = breaks[i];
+    const tierEnd = tiers[i].max;
+    const price = parseFloat(document.getElementById(tiers[i].field).value) || 0;
+    const inThisTier = Math.min(remaining, tierEnd - tierStart);
+    total += inThisTier * price;
+    remaining -= inThisTier;
+  }
+  return total;
+}
+
+function getViewCameraPrice(n) {
+  if (n <= 0) return 0;
+  const tiers = [
+    { max: 1, field: 'p_view_t1' },
+    { max: 3, field: 'p_view_t2' },
+    { max: 5, field: 'p_view_t3' },
+    { max: 7, field: 'p_view_t4' },
+    { max: Infinity, field: 'p_view_t5' }
+  ];
+  let total = 0, remaining = n;
+  const breaks = [0, 1, 3, 5, 7];
+  for (let i = 0; i < tiers.length && remaining > 0; i++) {
+    const tierStart = breaks[i];
+    const tierEnd = tiers[i].max;
+    const price = parseFloat(document.getElementById(tiers[i].field).value) || 0;
+    const inThisTier = Math.min(remaining, tierEnd - tierStart);
+    total += inThisTier * price;
+    remaining -= inThisTier;
+  }
+  return total;
+}
+
+function getSelectCost(id) {
+  const sel = document.getElementById(id);
+  const opt = sel.options[sel.selectedIndex];
+  return parseFloat(opt.getAttribute('data-cost')) || 0;
+}
+
+function getEpatrolAnnualCost() {
+  const sel = document.getElementById('epatrols');
+  const opt = sel.options[sel.selectedIndex];
+  const dailyCost = parseFloat(opt.getAttribute('data-cost')) || 0;
+  return dailyCost * 365;
+}
+
+function fmt(n) {
+  return '£' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// ─── SUMMARY UPDATE ─────────────────────────────────────────────────────────
+
+function updateSummary() {
+  const monCam = parseInt(document.getElementById('monCameras').value) || 0;
+  const viewCam = parseInt(document.getElementById('viewCameras').value) || 0;
+  const boundaryEl = document.getElementById('siteBoundary');
+  const boundaryOpt = boundaryEl.options[boundaryEl.selectedIndex];
+  const boundaryCost = parseFloat(boundaryOpt.getAttribute('data-cost')) || 0;
+
+  const monCost = getMonitoredCameraPrice(monCam);
+  const viewCost = getViewCameraPrice(viewCam);
+  const armCost = getSelectCost('armDisarm');
+  const audioCost = getSelectCost('audio');
+  const epatrolCost = getEpatrolAnnualCost();
+  const aiCost = getSelectCost('ai');
+  const scriptCost = getSelectCost('scripting');
+  const tempCost = getSelectCost('tempFire');
+  const r1Cost = getSelectCost('report1');
+  const r2Cost = getSelectCost('report2');
+  const r3Cost = getSelectCost('report3');
+
+  const subtotal = boundaryCost + monCost + viewCost + armCost + audioCost + epatrolCost + aiCost + scriptCost + tempCost + r1Cost + r2Cost + r3Cost;
+  const discountRate = parseFloat(document.getElementById('discount').value) || 0;
+  const discountAmt = subtotal * discountRate;
+  const total = subtotal - discountAmt;
+  const monthly = total / 12;
+
+  // Build summary lines
+  const lines = [
+    { label: 'Site Boundary', val: boundaryCost },
+    { label: `Monitored Cameras (${monCam})`, val: monCost },
+    { label: `View Only Cameras (${viewCam})`, val: viewCost },
+    { label: 'Arm & Disarm', val: armCost },
+    { label: 'Audio', val: audioCost },
+    { label: 'E-Patrols (annual)', val: epatrolCost },
+    { label: 'AI Filtering (annual)', val: aiCost },
+    { label: 'Alarm Scripting', val: scriptCost },
+    { label: 'Temp / Fire Monitoring', val: tempCost },
+    { label: 'Reporting Option 1', val: r1Cost },
+    { label: 'Reporting Option 2', val: r2Cost },
+    { label: 'Reporting Option 3', val: r3Cost },
+  ];
+
+  const container = document.getElementById('summaryLines');
+  container.innerHTML = lines.map(l =>
+    `<div class="summary-line${l.val === 0 ? ' zero' : ''}">
+      <span class="label">${l.label}</span>
+      <span class="val">${fmt(l.val)}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('totalSubtotal').textContent = fmt(subtotal);
+  document.getElementById('totalFinal').textContent = fmt(total);
+  document.getElementById('totalMonthly').textContent = fmt(monthly) + '/mo';
+
+  if (discountRate > 0) {
+    document.getElementById('discountRow').style.display = 'flex';
+    document.getElementById('discountBadge').textContent = (discountRate * 100) + '%';
+    document.getElementById('discountAmount').textContent = '–' + fmt(discountAmt);
+    document.getElementById('totalSubtotal').style.textDecoration = 'line-through';
+  } else {
+    document.getElementById('discountRow').style.display = 'none';
+    document.getElementById('totalSubtotal').style.textDecoration = 'none';
+  }
+}
+
+function updateBoundaryOptions() {
+  const closedP = parseFloat(document.getElementById('p_closed').value) || 95;
+  const openP = parseFloat(document.getElementById('p_open').value) || 155;
+  const sel = document.getElementById('siteBoundary');
+  // options[0] is "Please select...", closed is [1], open is [2]
+  sel.options[1].setAttribute('data-cost', closedP);
+  sel.options[1].text = `Closed – Clear border (£${closedP})`;
+  sel.options[2].setAttribute('data-cost', openP);
+  sel.options[2].text = `Open – Arc discretion (£${openP})`;
+}
+
+function toggleAdmin() {
+  const el = document.getElementById('adminSection');
+  el.classList.toggle('open');
+}
+
+// ─── SET TODAY'S DATE ────────────────────────────────────────────────────────
+function getQuoteRef() {
+  const suffix = document.getElementById('quoteRefSuffix').value.trim();
+  const prefix = document.getElementById('quoteRefPrefix').textContent;
+  if (!suffix) return prefix + '___';
+  return prefix + String(suffix).padStart(3, '0');
+}
+
+// ── LOAD PRICING FROM pricing.json ───────────────────────────────────────────
+async function loadPricingConfig() {
+  try {
+    const resp = await fetch('pricing.json?v=' + Date.now());
+    if (!resp.ok) throw new Error('Not found');
+    const pricing = await resp.json();
+
+    // Apply monitored camera prices
+    const monMap = { t1:'p_mon_t1',t2:'p_mon_t2',t3:'p_mon_t3',t4:'p_mon_t4',
+                     t5:'p_mon_t5',t6:'p_mon_t6',t7:'p_mon_t7',t8:'p_mon_t8',
+                     t9:'p_mon_t9',t10:'p_mon_t10',t11:'p_mon_t11' };
+    if (pricing.monitoredCameras) {
+      Object.entries(monMap).forEach(([key, id]) => {
+        if (pricing.monitoredCameras[key]) {
+          const el = document.getElementById(id);
+          if (el) el.value = pricing.monitoredCameras[key].pricePerCam;
+        }
+      });
+    }
+
+    // Apply view only camera prices
+    const viewMap = { t1:'p_view_t1',t2:'p_view_t2',t3:'p_view_t3',t4:'p_view_t4',t5:'p_view_t5' };
+    if (pricing.viewOnlyCameras) {
+      Object.entries(viewMap).forEach(([key, id]) => {
+        if (pricing.viewOnlyCameras[key]) {
+          const el = document.getElementById(id);
+          if (el) el.value = pricing.viewOnlyCameras[key].pricePerCam;
+        }
+      });
+    }
+
+    // Apply site boundary prices
+    if (pricing.siteBoundary) {
+      const closed = document.getElementById('p_closed');
+      const open   = document.getElementById('p_open');
+      if (closed && pricing.siteBoundary.closed) closed.value = pricing.siteBoundary.closed.price;
+      if (open   && pricing.siteBoundary.open)   open.value   = pricing.siteBoundary.open.price;
+      updateBoundaryOptions();
+    }
+
+    // Show last updated indicator
+    if (pricing.lastUpdated) {
+      const indicator = document.getElementById('pricingIndicator');
+      if (indicator) {
+        indicator.textContent = `Pricing: ${pricing.lastUpdated}${pricing._updateNotes ? ' — ' + pricing._updateNotes : ''}`;
+        indicator.style.display = 'inline';
+      }
+    }
+
+    updateSummary();
+    console.log('Pricing loaded from pricing.json', pricing.lastUpdated || '');
+  } catch(e) {
+    // Silently fall back to hardcoded defaults — they're already in the input values
+    console.log('pricing.json not found, using defaults.');
+    updateSummary();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const yyyy = today.getFullYear();
+  document.getElementById('quoteDate').value = `${dd}/${mm}/${yyyy}`;
+  // Set quote ref prefix
+  document.getElementById('quoteRefPrefix').textContent = `ArcQuote-${mm}-${yyyy}-`;
+  // Load pricing from config file
+  loadPricingConfig();
+  document.querySelectorAll('input, select').forEach(el => el.addEventListener('change', updateSummary));
+});
+
+// ─── PDF GENERATION ──────────────────────────────────────────────────────────
+
+// ─── SECRET DISCOUNT REVEAL (double-click mini logo) ────────────────────────
+function showDiscount(event) {
+  document.getElementById('discountLogoPlaceholder').style.display = 'none';
+  document.getElementById('discountRow-form').style.display = 'block';
+  celebrationBurst(event);
+}
+
+function celebrationBurst(event) {
+  const emojis = ['🎉','💥','⭐','🎊','💰','✨','🥳','💸'];
+  const count = 14;
+  const originX = event ? event.clientX : window.innerWidth / 2;
+  const originY = event ? event.clientY : window.innerHeight / 2;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('span');
+    el.className = 'emoji-burst';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.8;
+    const dist = 80 + Math.random() * 100;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - 40;
+    el.style.left = originX + 'px';
+    el.style.top = originY + 'px';
+    el.style.setProperty('--dx', dx + 'px');
+    el.style.setProperty('--dy', dy + 'px');
+    el.style.animationDelay = (Math.random() * 0.15) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1100);
+  }
+}
+function hideDiscount() {
+  document.getElementById('discountRow-form').style.display = 'none';
+  document.getElementById('discount').value = '0';
+  updateSummary();
+  document.getElementById('discountLogoPlaceholder').style.display = 'flex';
+}
+
+// ─── MANDATORY FIELD VALIDATION ──────────────────────────────────────────────
+function validateForm() {
+  let errors = [];
+
+  // Text input fields
+  const textFields = [
+    { id: 'custName',    label: 'Name' },
+    { id: 'custCompany', label: 'Company Name' },
+    { id: 'custEmail',   label: 'Email Address' },
+  ];
+  textFields.forEach(f => {
+    const input = document.getElementById(f.id);
+    const row = input.closest('.form-row');
+    if (!input.value.trim()) {
+      row.classList.add('field-error');
+      errors.push(f.label);
+    } else {
+      row.classList.remove('field-error');
+    }
+  });
+
+  // Site boundary — must not be "please select" (empty value)
+  const boundary = document.getElementById('siteBoundary');
+  const boundaryRow = boundary.closest('.form-row');
+  if (!boundary.value) {
+    boundaryRow.classList.add('field-error');
+    errors.push('Site Boundary Status');
+  } else {
+    boundaryRow.classList.remove('field-error');
+  }
+
+  // Arm & disarm — must not be "please select" (empty value)
+  const arm = document.getElementById('armDisarm');
+  const armRow = arm.closest('.form-row');
+  if (!arm.value) {
+    armRow.classList.add('field-error');
+    errors.push('Arm & Disarm');
+  } else {
+    armRow.classList.remove('field-error');
+  }
+
+  // Camera count — monitored + view only must be > 0
+  const monCam = parseInt(document.getElementById('monCameras').value) || 0;
+  const viewCam = parseInt(document.getElementById('viewCameras').value) || 0;
+  const monRow = document.getElementById('monCameras').closest('.form-row');
+  const viewRow = document.getElementById('viewCameras').closest('.form-row');
+  if (monCam + viewCam === 0) {
+    monRow.classList.add('field-error');
+    viewRow.classList.add('field-error');
+    errors.push('Camera count (must have at least 1 monitored or view only camera)');
+  } else {
+    monRow.classList.remove('field-error');
+    viewRow.classList.remove('field-error');
+  }
+
+  const banner = document.getElementById('validationBanner');
+  if (errors.length) {
+    banner.innerHTML = '<strong>Please complete the following before generating:</strong><br>' +
+      errors.map(e => '&bull; ' + e).join('<br>');
+    banner.style.display = 'block';
+    return false;
+  }
+  banner.style.display = 'none';
+  return true;
+}
+
+// Clear error state on input/change
+['custName','custCompany','custEmail'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function() {
+    if (this.value.trim()) this.closest('.form-row').classList.remove('field-error');
+    revalidateBanner();
+  });
+});
+['siteBoundary','armDisarm'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', function() {
+    if (this.value) this.closest('.form-row').classList.remove('field-error');
+    revalidateBanner();
+  });
+});
+['monCameras','viewCameras'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function() {
+    const mon = parseInt(document.getElementById('monCameras').value) || 0;
+    const view = parseInt(document.getElementById('viewCameras').value) || 0;
+    if (mon + view > 0) {
+      document.getElementById('monCameras').closest('.form-row').classList.remove('field-error');
+      document.getElementById('viewCameras').closest('.form-row').classList.remove('field-error');
+    }
+    revalidateBanner();
+  });
+});
+
+function revalidateBanner() {
+  // Only hide the banner if all fields are now clean — don't re-trigger full validation
+  const hasErrors = document.querySelectorAll('.form-row.field-error').length > 0;
+  if (!hasErrors) document.getElementById('validationBanner').style.display = 'none';
+}
+
+function generatePDF() {
+  if (!validateForm()) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+  const aqua = [88, 195, 187];
+  const grey = [141, 144, 145];
+  const dark = [44, 51, 51];
+  const lightAqua = [232, 249, 248];
+  const white = [255, 255, 255];
+  const pageW = 210;
+  const pageH = 297;
+  const margin = 18;
+  const contentW = pageW - margin * 2;
+
+  // ── LOGO ──────────────────────────────────────────────
+  const logoB64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCADQAfQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopMgUALRXN658R/A3hzK6x4osIZF6xLKJJP++Ey36VwOs/tNeELPKaLpOo6k46MyiCM/i2W/wDHaai2cNfMsJhv4tRL53f3LU9ipK+ZdY/aX8a3m5NI0zTdOQ9GKtO4/EkL/wCO1xWq/FH4h60W+3+L9R2t1SCTyE/KMCrVNnj1uKcHT0ppy+Vl+Ov4H2Ne6ppump5mo6hbWqf3p5VjH5sRXL6j8YvhpphZbjxfYuy/w25ac/8AjgNfHc0kly5luZHmc8lpGLn8zTfaqVJdTy6vFtZ/wqaXq2/8j6hvv2k/h9bZFpBq14R0MdsEU/i7D+VYF3+1NZLkWHg25f0M14qfoqtXz7RVKnE4KnEuYT2kl6Jfrc9quP2ovEbH/RPCumxjt5k8j/yAqhN+0z49kP7vTNEjH/XGRv5vXklFPkj2OWWd5hLeq/wX6HqZ/aQ+IpORHo49vsjf/F0+P9pT4hIfntNFk+ts4/k9eU0UcsexH9sY9f8AL1/eey2/7UHitCPtfhvSZR38t5Yz+pat6w/alsGKrqng+5i9Wt7pZP0YL/OvnyilyRN4Z/mMP+Xl/VL/ACPrHR/j/wDDXVSEm1WfTnP8N7bsgz/vLlf1rvNN1bS9YtxdaTqNteQn/lpbyrIv5g18JVY07UtR0e5W90m/uLK4U5EtvKY2/Mdal0l0PUw/FlaLtXgmvLR/r+h94UV8zeDv2jvE2kNHa+KrZdYtRgGZAI7hR6/3X/EA+9e+eE/G3hrxtY/b/D2pJcBcebEfllhPo6HkfXoexNZuLjufUYDN8LmGlKXvdno/+D8jdoooqT0wooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooqlqus6Todqb3WNStrKBf8AlpPKqL+Z60ClJRV5OyLtFeS+JP2kPBWlbodDt7rWZhwGjXyof++35P4Ka8t8RftCfEDWt0Wnz2+jwNxi1TdJj/ro+f0Aq1Bs8XFcQ4HDaKXM/wC7r+O34n1DqOq6ZpFubrVdRtrOEdZJ5VjX8ya881/9ob4e6Puj0+5udXmHQWkXyZ/33wPyzXy7qGpahq1wbvVb+4vZ2OTJcStI35sTVerVNdT57E8V156YeCj66v8ARfmexa/+0z4rvt0fh/SLLTIz0klJuJR+eFH5GvOtc8d+MvEm4a34l1C5RjkxeaUj/wC+Fwv6VhUVailseDiMyxeK/i1G122X3LQQAL90AZ9KWiiqOEKKQkL94gfU1s6P4O8V+IMf2J4c1G8U/wAcdu2z/vs4X9aRcKc6j5YK78jHor0/SP2dPiLqOGvY9P0xDz/pFxvb/vmMH+ddnpf7LdmoVtb8W3Eh/iS0tljH/fTFj+lS5xR6dHI8wr7U2vXT89T59pCQv3iB9a+r9N/Z6+Gdhgz6bd35He5u3IP4JtFdLp/w28AaXj7F4P0lCOjNaq7fmwJpe0R6dPhTFS+OcV97/Q+LEBlOIgXPooz/ACq7BoWuXWPs2iajLn+5aSN/Ja+47awsbMBbSzggA6CONVH6Cp8VPtfI7IcIr7VX/wAl/wCCfEKeCvGcozH4R1ph7WEv/wATSt4I8aIMv4Q1pR72Ev8A8TX27S0e1Zr/AKpUf+fj+5HwpcaFrlpn7Vomow46+ZaSL/NaosQjbXO1vQ8GvvjFU77RNG1NSupaTZ3SnqJ4Ef8AmKPa+RjPhH+Sr96/4J8KUV9d6x8D/hprAYt4cjspG/5aWUjQkfgDt/SvOfEv7MNzErz+EvEKzYyRb36bT9BIgx+a/jVKomeXieGsdQV4JSXk9fudjwqruja3q3h7UYtW0S/ls7uE/LLGcHHcEdGU9weDVrxJ4S8SeEbv7H4i0ieycnCM4zHJ/uOMq34Gsir3PDaqUJ2d4yXyaPqz4UfGXT/HcS6RqwjstdjXJjBxHcgdWjz39V6jqMjp6ZXwXb3FxaXEV3aTyQzwuJIpI22sjA5BBHQivq34OfFOLx9pZ0/U2SPXLFB56jgTp0Eqj9GHY+xFYzhbVH3eRZ59bthsQ/f6Pv8A8H8z0eiiisz6kKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKrahqWn6TavfanewWlvGMvLNIEQfieK8m8XftJeGtL32vhWzk1i4GQJmzFbg+uSNzfgAPemk3scmKx2HwUeavNL8/u3PYSQOSa4bxZ8aPAXhMvbz6qL68Tj7NY4lYH0Zs7V/E5r5u8WfFTxx4yLx6rrMkVq3/Lpa5ihx6EDlv+BE1yIAAwBgVoqfc+VxnFbfu4SHzf+X/B+R654p/aQ8Xatvt/DtrBo1ucgScTTkf7xG1fwB+teXalqmp6zdG91fUbm9uG6y3Epkb8Cen4VVorVJLY+XxWOxOMd682/wAvu2CiiimcgUVPY6ff6pcrZaZZXF3cP92KCNpHP4AZr0nw1+zv471oJNqottFt2wT9obzJse0a9D9WFJtLc6cNgsRi3ahBy/L79jy+p7DT7/VbgWml2NxeTtwI7eJpG/JQa+nfDv7OngPSNsuri61qcdftD7Is+0aY/UmvSNN0jStGtxaaTpttZQjpHbxLGv5AVm6i6H0WG4Urz1xE1HyWr/y/M+W9A+AHxF1rbJdWNvpMLc7r2X58f7iZP54r0fQv2YvDtrtk8Ra7e6g/UxwAQR59M8sfzFe00VDqSZ9BhuHMDQ1lHmfn/lojmdD+GngPw5htJ8L2Ecg6SvH5sn13vk/rXSgADAGAO1LRUXuezTpU6K5acUl5KwUUUUGgUUUUAFFFFABRRRQAUUUUAFFFFAFTU9K03WrKXTdWsYLu1mGHimQMp/A9/evnr4n/ALP9zosc2veCFlurJMvLYEl5oR3MZ6uo9D8w96+kKKqMnHY8/H5Zh8xhy1Vr0fVf12PgetHw7r+peFtatNe0iby7q0feufuuOjI3qrDIP1r2z46/CGNYrjxz4XtApTMmpWsa8Ed5kA7j+IDqPm6g58CrdNSR+bY3B1srxHJLdaprr5o+4PCXifT/ABj4es/EOmN+6ukyUJy0bjhkb3ByP1rYr5m/Z08cNo3iGTwjezYs9YO63yeEuVHT/gajH1Va+mawlHldj9HynHrMcNGr9rZ+v/B3CiiipPSCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiub8W/EPwj4KiL6/q8UUxGUto/nnf6IOfxOB714d4x/aR8Qap5lp4Rsl0m3OQLiUCS4YeoH3U/8AHj71Si5bHmY3N8JgNKsry7LV/wDA+dj37xF4s8OeFLX7Z4h1e3so/wCESN87+yqPmY/QV4v4w/aZkffaeCNJ2joL2+HP1WIf+zH8K8Nv9Qv9Vu3v9TvZ7u5kOXmnkLu34moK1VNLc+PxvE+JxF40FyL739/T5feaev8AifxB4puvtviHV7m/lByvmv8AKn+6o+VfwFZlFFWfOTnKpJym7t9wooo9Pc4HuaZIUnQZNeg+Dvgf458WeXcy2Q0mxfB+0XqlWYeqx/eP44HvXuPhD4D+BvC5S5u7U6xepg+degFFP+zH90fjk+9Q5pHtYLIcZjbS5eWPd6fct/0PnTwp8NvGfjNlbQ9Fla3J5up/3UA/4Efvf8BBr2fwp+zPotlsufF+qy6jKOTb22YoQfQt99v/AB2valVUUIihVUYAAwAKWsnUb2PrcHw3hMNaVT35ee33f53M7RfDuheHLUWehaTa2MI6rBEF3e5PUn3NaNFFQe/GMYLlirIKKKKCgooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigBGVXUo6hlYYIIyCK+RPjJ4CHgXxY6WURXS9SDXNn6Jz88X/ASRj/AGWWvryvPPjr4VXxL4Bu54ot13pP+nQEDnCj94v4pu/ECrg7M8TPsAsbhG0vejqv1XzX42Pk62ubizuYby0lMU9vIssTg8q6nKn8CBX2z4L8SQeLvC2m+IYMD7ZAruo/gkHDr+DAiviL6V9B/sw+JDLZar4TmkybdxfW4P8Acf5XH4MFP/Aq0qK6ufMcL4t0cU6D2mvxWq/C57rRRRWB+hBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUVxHjT4weCvBW+3vNQ+2X6/8udpiSQH/AGj91P8AgRz7V4P4z+PXjTxT5lpp0w0SwbI8u1c+cw/2pev4Lj8apQcjx8dnmEwN4ylzS7L9eiPoDxl8VPBnggNFquqLLeAcWdt+8mP1A4X6sRXhXjL9oXxf4g32mgqNDs24zE2+4Ye8nRf+AjPvXlZJZizElmOSSckn1J70VsoJHxuO4ixeLvGD5I9lv83/AJWHSyyzyvPPK8ssh3O7sWZj6knk02iirPB3CiilRHkdYo0Z3c7VVQSzH0AHJNACUqK0jrHGrM7naqqMlj6ADqa9R8Ffs++LvEmy813/AIkdi3P71d1w49o/4fq2PpXvXg34X+DvA6K2j6Wr3eMNeXH7ydv+BH7v0UAVEppHv4Dh7FYy0prkj3e/yX+djwHwZ8APGPiXy7vWFGh2LYO64XdOw/2Y+3/AiPoa938G/CTwV4KCT6fpgub5Rze3eJJc/wCzxhP+AgV2dFYubkfZYHJMJgbSjG8u71fy6IKKKKk9cKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKjnhjuIXt5kDxyKUdT0KkYI/KpKKA3PhXXdLfQ9b1DRZPvWF1LbfgjkD9AK6j4Ma6dA+JGkTM+2K8kNjLzgESjC5/4HsNL8arIWPxQ12NRgSyxz/wDfcSE/rmuLguJbOeO7gYiSB1lQjsykEfqK6fiR+SybwGNbj9iX5M+9aKqaTfx6rpdnqcOPLvII51x6OoYfzq3XMfrMWpJNBRRRQMKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiuC8a/GjwX4M8y1kvP7R1BOPsloQ7KfR2+6n4nPtXgfjX42+NfGHmWqXX9lae+R9ms2IZh6PJ95voMD2q1Bs8bH57hMDeN+aXZfq9l+fke/eNfjN4K8FmS1mvf7Q1BOPsloQ7KfR2+6n4nPtXgvjT44+NfF3mWtvc/2Pp75H2e0ch2H+3J94/QYHtXnfTpS1qoJHxePz/F428U+WPZfq93+XkH9eaKKKs8QKKKQ8cmgBaACxCqCSxwABkk+gr0LwP8EPGPjHy7u4g/sjTXwftN0hDuv+xHwT9Tge5r6C8E/CXwd4GVJ7Cw+1X4HN7dYeXP8As9kH+6B9TUSmke5gMgxWOtJrlj3f6L+keEeCfgH4v8UeXeawp0SwbB3Tpmdx/sx9vq2Poa9+8GfC/wAH+BkV9I01XvMYa8uMSTt9G/hHsoArraKxlNyPtsBkuEwFpQV5d3v8uwUUUVJ6wUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFYHijx34T8GxCTxFrMFqzjKQ8vK/+6i5Y/XGKLXIqVIUo89RpLu9DforxPVf2odAgdk0Xwzf3gHR55UgB/AbjWBN+1HrhJ+z+EbBR233bsf0UVfJI8ipxBl1N29pf0Tf6H0XRXzpF+1HrgI87wjYMO+y6df5qa29N/aj0eV1XV/Cl7br3e3nSbH4EKaOSQQ4hy6bt7S3qn/ke4UVzHhL4keDvGw2aDrEclwBua1lBjmUf7jcke4yK6eoasetSq068eenJNd1qFFFc3448faH8P7C31HXY7t4rmbyEFvEHbdtLcgkcYBo3CrVhRg6lR2S6nSUV5P/AMNLfDz/AJ9ta/8AARf/AIupLb9o/wCH91cRWsdtrIeaRYlzaqBliAM/P6mq5ZdjhWb4F6KqvvPVKKqarq2m6Jp82q6vexWlpbrvlllbCqP89B1NeLeIP2n7CCd4PDPhyS7jU4Fxdy+SG9wgBOPqQfakouWxri8xw2BS9vO1+m7+5HulFfPVh+1JqCyD+0/B9u8fc292ysPwZSP1r07wR8X/AAb46mWw0+7ktdQYEizul2SNgZO0jKtjnoc+1NwaMMNnOCxcuSnU17O6/M8D/aAH/F0dR97e1J/79ivOq9C+Prhvinqoz92K2X/yCp/rXntbx2R+c5p/vtb/ABS/M+v/AIJ6n/anwy0ORn3Pbwtat7eW7KP0Arua8g/ZlvhP4IvrEnLWmpSY9ldEb+ea9frCSs2fpWVVfbYKlP8Aur8NAoorH8R+L/DXhK2F34i1i3skb7iu2Xf/AHUGWb8BUndOcacXKbsl1ZsUV4trP7T3hu2do9D8P39/jgSTOtuh+g+ZvzArnJf2o9dLZg8JWCr6PdOx/RRV8kjyKnEGXU3b2l/RN/ofRlFfPdn+1Lfqw+3+DYHXv5N6yn/x5DXYeHv2i/AWrukGqfa9HlbjNzGGiz/vpnH4gUnCSLo57l9d8saiT87r8z1SiobS8tL+3jvLG5iuIJRuSWJw6MPUEcGpqk9VNNXQUUUUDCiiigAoriPG3xf8GeBw9veX32zUFHFlakPID/tnon4nPsa8B8bfHHxn4v8AMtLa4/sfTnyPs9o5Duvo8nBP0GBVRg5Hj4/PMJgLxb5pdl+vb8/I968bfGXwZ4K8y1mvf7Q1FOPsdoQ7Kf8Abb7qfic+1eBeNfjb408Y+Zax3X9lae+R9mtGIZl9Hk+830GB7V59/wDrpa2jBI+Kx+fYvHXinyx7L9Xu/wAvIOnSiiirPECiiigAo966Hwh4A8VeOLjyfD+mPJErbZLqT5II/q56n2GT7V9BeBf2fvC3hry7/wAQbdb1BcMPNTFvG3+zH/F9Wz9BUSmonq4DJ8VmDvBWj3e3y7/I8O8EfCbxj46ZJ7Cy+yaex5vroFYyP9gdX/Dj3FfQvgb4J+DvBnl3j2/9qaknP2u6UEIf+mafdT68n3r0BVVFCIoVVGAAMAClrKU3I+4y/IcLgbSa5p93+i6fn5hRRRUHthRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFQXt5b6fZz392+yC2jaaRv7qqCSfyFAm0ldnnXxm+K48BWKaVo5jk1u9QtHuG5baPp5jDuc5CjuQSeBz8tX19e6neS6hqN3LdXU7bpZpXLO59yaveKvEd54t8Q33iK+J8y9lLqpP8Aq4+iIPYKAKyq6Ix5UflubZnPMa7d/cWy/X1YUV1vw8+Guu/EW/kg05ktrO2I+03kqkpGT0UAfeYjnHHuRxXs1n+zB4RjiC32vavPLjlozHGv4Daf503NLcWDybGY6HtKUfd7vQ+bKK+iNW/Zd0Z4WOh+J76CUD5Vuo0lQn32hSK8M8T+GdW8Ia3caDrUIjubcg5U5SRD911PdT/iDyKFJS2IxuVYrL0pV42T67ozYJ57WeO5tppIZomDxyRsVZGHQgjkGvpv4HfFi48ZQSeG/EMqtq9nH5kc/A+1RA4JI/vrkZx1BB9a+Ya6j4XatJovxC0C+RyoN6kEh9Ul/dsP/Hv0pTjdGmT4+pgcVHlfutpNeT/yPtCvGP2n/wDkVNI/7CX/ALSevZq8Z/af/wCRU0j/ALCX/tJ6xh8SPvs8/wCRfV9P1R83Va0khdWsGYgAXcJJJwAPMWqtFdJ+WxfK0z0X4zfEyfxzrj6bp07DRNOlZYFB4uJAcGY+vcL6Dnqa86oALEKoJJOAAMkn0rutK+CHxM1e1W8h8O/Z43GVF3OkLkf7pO4fiBU6RVjtn9azStKqouUn2Tdv+AcLXtf7Mvhr7XrOpeK548pYxC0tyR/y1k5cj6KAP+B15n4m8A+MPBwMniLQbm1hBx54xJD/AN9qSB+OK+pfg/4ZPhb4f6ZZTR7Lm5j+2XI7+ZJ82D9F2r+FTOXu6Hq8P4CcsferFrkV9VbXp/n8j5x+NU4uPihr7g/cmjj/AO+YUFcTXRfEe6F74/8AEVypyG1KdQfZW2j/ANBrnatbHi42XPiaku8n+Z77+yzdfJ4jsiejW0wH1Dqf5Cve6+cP2XpiviXW7fPD2MT/APfMhH/s1e0fEfxlD4F8JXmvMFedQIbWNukk7cKPoOSfZTWE1eR9/kVeNLKo1Kjso81/vZyfxf8AjLD4IVtB0ERXGuSJli3zR2inozDux6hfxPGAfmTU9V1LWr6XU9Xvpry7mOXmmbcx9vYew4FR3t5d6jeT6hf3Dz3NzI0s0rnLO5OSTUNbRionxWZ5pWzKrzSdorZdv+CFFdF4L8A+JPHt+1loNoCkWPPuZTthhB6bm9fQDJr2Cw/ZbsRAp1TxfctMR8wtrZFQH23Ek/pQ5Jbk4TKcZjo89GGnfZfjufPtFe1+J/2ZdWsLV7vwtri6iyDP2W5jEUjeyuDtJ9iB9a8YuLee0nktbqF4ZoXMckbqVZGBwQQehBoUlLYyxeAxGBko142v933o6fwB8SPEPw91BZ9MmM1jI2bmxkb93KO5H9x/Rh+ORX1v4X8TaV4v0S217Rp/Mt7lc4PDRsOGRh2YHgj+lfDteq/s+eN5PD/iweG7uY/YNbIRQTwlyB8jD/eHyn/gPpUzjdXPZ4fzaeGrLDVXeEtF5P8Ayf8AwT6jooorA/Qzj/GvxV8HeBlaLVNQE96BlbK2w8x+o6IPdiK8A8b/AB48Y+K/Ms9Nl/sXT2yPKtnPnOv+3L1/BcD615uzM7M7sWZjuZickn1J7mkrojBI/NMfxBisbeMXyR7Lf5v/AIYDyST1JyT6miiirPCCiiigAoqazsrzUbqOx0+1mubmY7Y4YULu59gOTXtHgT9m+/vfL1Hx1cmzh4YWFu4MrezuOF+i5PuKlyUdzsweX4jHy5aEb+fRerPI9A8N674ovxpnh/S5724OMrGvCD1Zjwo9yRXvPgX9m/TbHy9Q8cXK384wwsoSRAp9Hbhn+nA+teuaH4f0Xw1Yppmg6ZBZWydEiXGT6k9WPucmtGspVG9j7fLuGsPhrTxHvy/BfLr8/uIbSztLC2js7G2it4Il2xxRIFRB6ADgVNRRWZ9IkkrIKKKKBhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABUF9Y2mp2c2n39uk9tcIY5YnGVdSMEEelT0UCaTVmedan8AfhlqOTHostix/itLl0/8dJK/pXJ6n+y5pEhZtH8V3sH91LmBJR+a7TXuNZ+r6/ofh+3N1rerWljFjIa4mVM/TPX8KpSkeZXynL5pyqU4pd9vysZnw/8AB1v4F8LWfh6GRJZIgXuJlXb50zHLNj8gPYCujry/WP2ivh1ppZLKe91Rx0+y25CE/wC8+0flmuM1X9qS8fK6H4Sij9HvLkt/46gH/oVPlkzF5vluCgqUaistElr+R9B186/tR2sKazoN6oHmy208T+u1XUrn/vpq47Wvjn8StaDJ/bosIm/gsYhER/wI5b9a4e6u7q+na6vbqa4mc5aSaQuzfUk5q4Qad2fPZxn9DHYd4elB621emzvtr+hFVvSJTBq9hMvWO7gcfhIpqpVjThnUbQAZzcRf+hitT5SGkkfd4rxn9p//AJFTSP8AsJf+0nr2YV4z+0//AMippH/YS/8AaT1zQ+JH6hnf/Ivq+n6o+bqKKK6T8tPbP2bfBFtqV/d+NNRgEiae4t7IMMgTEZeT6qCoHoWPpX0ZXn/wI09LH4X6Qyrhrrzbl/ctI2P0Ar0Cuabuz9TyXDRw2BppLVq79Xr/AMAjmghuYnguIklikBV0dQysPQg8EUrskMRdiFRFyfYCn1z/AMQNUGjeCNd1ItgwWExU/wC0UIX9SKnc9GrNUoSqPor/AHHxdqF019qF1fMcm5nkmJ/3nLf1qCkUbVC+gxS11n4425O7PX/2Y5NvjfUU/v6W36Sx/wCNXf2nfED3GuaV4Zik/dWcBvJVB6ySEqufoqn/AL6rM/Zn/wCR+vP+wVL/AOjY65/43XpvvihrjE8QPFbr7BYl/qTWdrzPpHXdPIlBfanb9f0OGp8EE11PFa26b5ZnWKNfVmOAPzIpldT8K7NL74j+Hbd1BX7ekhB/2AX/APZat6Hz9Cn7arGn3aX3s+sfBPhOw8FeGrPQLFF/cIDNIBzLMR87n1JP5DA7VvUg6Utcu5+wU6caUFCCslogr56/aD+Hmo3fiaw13w3ol1eSanE0d0lrA0h82PG12wOMqcZP92voWinF8rucmYYCGY0HRm7bO/b+tj5D0z4GfE7UwGHh37Ih/iu7hI8fgCW/Suy0P9mfxRFcwXl/4qsLKSGRZUNtE8zKykEHJ2jqK+iqKp1GeXR4YwNLWV5er/ysNUMFAZgWA5IGMminUVB9EfA9FFFdZ+LhRRXW+B/hd4t8eyLJpVl5FjnD31wCsI9dvdz7L+JFJu25rRoVMRNU6UW2+xyX9eK9O8B/ATxT4q8u/wBaDaLprYYNKn+kSr/sxn7o92x9DXtfgP4MeEvA/l3nk/2lqi8/bLlQdh/6Zp0T68n3rv6ylU7H2OXcLpWqY13/ALq/V/5fec54P+H/AIV8DWvkaBpqRyMMS3Mnzzy/7znn8Bge1dHRRWW59dSpQoxUKasl0QUUUUGgUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRXEfGPxZP4Q8B31/ZSGO8uitnbOOqvJwWHuFDEe4FNK7sY4itHD0pVp7RVzgPi18ebjTryfwz4HmQTQEx3WoYDbH6FIgeCR0LHIzwPWvBL+/vtUu3vtTvZ7u5kOWmnkLufxNQUV0Rio7H5Zj8xr5hUc6r06Lov67hR/EFH3j0Hc17V8IvgXZ+JdLh8U+Lnm+x3Pz2lnE+wypn77sOQD2AxxznnFe6aJ4M8KeHEVND8PWFmV/jjgXefqx+Y/ial1EtD1MDw3icXBVZtRi9ur+7/gnyDo3w+8b+INp0nwtqUyN0kaExx/99PgfrUvjL4e+IvAcdgfESW0cmoCQxxRS+YyBNudxAx/EOhNfaVfPf7UsgOo+HYc8rDctj6tGP6UozcnY68y4foZfgp1uZykreS1aW3/BPDKtaSM6tYj1uoR/5EWqtXNFAbWtOB6G8gH/AJEWtT5Sn8a9T7rFeM/tP/8AIqaR/wBhL/2k9ezCvGf2n/8AkVNI/wCwl/7SeuaHxI/T87/5F9X0/VHzdR0opD0NdJ+Wn2f8LIfs/wAOfDkeMf8AEtgb81z/AFrqq5/4ers8B+HVx00u2/8ARS10Fcr3P2DCrloQXkvyCvL/ANovV/7O+HMtkrgPqd1DbY7lQfMb9E/WvUK+df2oNbE+s6N4ejcEWsD3cgH96Q7Vz+CN+dOCvI4M9r+wwFR9Wrffp+R4jRRRXSflx65+zMm7xzqD4+5pT/rLHXHfFgEfErxGD/z/ADf+grXdfsvxlvFmsS44TTlX85R/8TXM/Hewaw+KGrHbhbpYLlfcNGAf1U1C+Nn0FaD/ALEpy/vv9TgK7P4NuI/if4fZu9w6/nE4rjK2fBeqJonjDRNXlOI7W/hkkPom4Bv0JqnsePhJqniKc3spJ/ifbw6UtIOnFLXKfsAUUVyXxI+INn8OdGg1e6sXvTcXK26QpIEY5UsWBI7Bf1oSuZVq0MPTdWo7RW51tFeTab+0p4Buwq31tqtgx6mS3Eij8UJP6V1emfFr4b6swS08YacGP8M8hhP5SAU3Fo5qWZ4Ot8FWP3o66io4J4LmFLi3mSWKRQyOjBlYHoQRwRRSO7c+C61PDvhfX/Fl+NM8PaXNeT8btgwkY9XY8KPqa9X8A/s5alqPl6l45maxtzhhYwsPPcf7bdEHsMn3Fe+6HoGi+G7BNM0LTYLK2TpHEuMn1J6sfc5NbyqJbH57l3DVfE2qYj3I9ur/AMvn9x5X4C/Z10XR/L1HxlKmq3gwwtVyLaM+/eQ/XA9q9hihigiSGCNI44wFVEUAKB0AA6Cn0Vi25bn2+EwNDAw5KEbfm/VhRRRSOsKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvFf2oWkHhnRkBOw6gxb6iJsf1r2qvO/jz4bn8RfD27a0iMlxpki36KBksqZDgf8AAGY/hVRdmjzc4pyq4GrGO9vy1PkukIyCPUYpfcGiuk/KT7S+GupWereAtBu7Er5YsIYiB/C6KEZfqGUiumr48+HPxW1/4dTSQ2saXumzvvms5WKjd/fRudrY68EHjI716v8A8NReHfI3f8IvqnnY+55kW3P+9n+lYSg76H6Ll/EGDnQiq0uWSVmtfwPaycV8mfHTxhZ+LvG7DTJVlstLh+xxyqcrI+4mRh6jJwD325qbx38d/FfjG3k0yyjXR9OlBV44JC0sqns0nHHsoHvmvNfYVcIW1Z4efZ5Tx0Pq+H+G92+/p5BVvRmCazp7not5AT/38WqlOjlMEiTjrEyyfkc/0rQ+Yi+WSZ96ivGf2n/+RU0j/sJf+0nr2G0uI7u1huojlJo1kU+oIyP5149+0/8A8ippH/YS/wDaT1zQ+JH6hnbvl1Vrt+qPm6kb7p+lLSN90/SulH5afbfgL/kR/D//AGC7X/0Utb1YPgL/AJEfw/8A9gu1/wDRS1vVyM/YsP8AwYei/IK+L/id4hHijx5rOrI++E3BggPbyo/kUj67Sfxr6j+KnigeEfAuqarHIFuWi+zWvPJmk+VSPpkt/wABr4zAwAPStaS6nyPFmK+DDL/E/wAl+otFFFbHxZ7p+y1bbr/xFd4+7FbRZ+rSH+lTftP+G33aT4thjJUBrC4IHTkvGT/4+Pyq/wDst2pTRNevSOJryKIf8Ajz/wCz16x4r8N2Hi7w9e+HtRB8m8jKbgOY2HKuPdWAP4Vg3adz7/BYH65kiodWm163bR8PUhAIwehrT8R+HdU8Ka1daDrEHl3Nq+08fK6/wuvqpHI/xBrNrY+CnCVOThJWaPqz4KfEyz8X6Db6LqFyq63p8QilRjg3EajAlX14xu9D7EV6ZXwXb3FxaTx3VpPJBNEweOSNyro3qCOQa73Tvj18TdOgW3Otw3aqMBrq1V3/ABYYJ/GspU9dD7LLuKIU6Sp4tO66rr6n1sSFBJOAOTXyv8evH1r4v8SQ6XpNws2naOHRZUOVlnb77A9wAAoP+92Nc/4k+LXj/wAV2zWOq6+62rjDwWyCFHHo23lh7E4rkKqEOXVnFnOfrH0/YUE1Hq3u/IKsadp11rGoWuk2SF7i9mS3iX/acgD+dV69u/Zy+H8t5qLePNTgItrXdFp4Yf6yU8PIPZRlQfUn0qpPlVzxcvwcsdiI0Y9d/JdWe/aRplvo2lWekWqgQ2UEdvHxj5UUKP5UVcormP1qMVFKK2CiiigYUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUjKrKVYAgjBB70tFAHzF8Xvgrf8Ahu8n8ReFbOS50aVjJJBEpZ7MnkjA5MfoR93oeOa8jBBGQcivvmuN8R/CH4feJ5XudR8PQx3L8tPasYHJ9TswCfqDWsaltz5DMeF1Vm6mEklfo9vk/wBD45or6cl/Zl8BO26PUtajH90XEZ/mlX9L/Z4+G2nyCS4s73UCO11dEr/3ym0Gq9ojyY8L45uz5V8/+AfM3h/w3rviq/XTPD+mTXtwTyIx8qD1djwo9ya9ouf2f7bQfhtrF3eut94iFt9oR0z5cHlkOY4x3JAILHr2Ar3LS9H0rRLRbHR9OtrK3XpHBEEX64Hf3q2yq6lHUMrDBBGQRUOo3se/guGaFCEvbPmk015K/bz8/wAj4IHIyOh6UYzwRxX2b/wqr4cf9CVpH/gKtH/Cqvhx/wBCVpH/AICrVe1R5H+qWJ/5+R/H/Izfgj4mXxJ8PdO8yTdc6av2CcE85jGFP4ptP51y37T/APyKmk/9hL/2k9eo6F4W8O+GVmXw/o1pp63BUyi3jCByM4Jx6ZNP1vw5oXiWCO11/SbW/hifzESeMOFbBGQD3wTWd0pXPqKuCrVsv+qTkuayV+mh8M4PpSMDtPHavs7/AIVV8OP+hK0j/wABVo/4VV8OP+hK0j/wGWtPao+X/wBUsT/PH8f8i74D/wCRH8P/APYMtf8A0Utb1RWtrb2NrDZWkKQwQIscUaDCoqjAAHoBT3DFSFbaSODjODWJ9zSi6dOMX0SPm79pPxgNT1+18I2cuYNKHnXODwbhxwP+Aof/AB8141X0lffs06RqV7PqN94w1aa5upWmmkaOLLOxyT09TUH/AAy54e/6GrVP+/UX+FbxlFKx8Jj8mzLHYiVeUFq+626fgfOlFfRf/DLnh7/oatU/79Rf4Uv/AAy54e/6GrVP+/UX+FP2kTk/1bzD+VfejZ/Zvsja/DkXBXBvL+4lB9QCEH/oFep1i+DvDFr4N8N2XhuynknislZRJIAGcsxYk446sa2qwk7u59/gKDw2Fp0ZbpK/r1ON+JPwy0X4i6asd0fsuo24P2W9Rcsmf4WH8SE9vxGDXy34x+H/AIp8DXTQa9prpDuIju4wWgl+j9j7HB9q+1qjngguYXt7mFJYpBtdHUMrD0IPBqozcTzs0yKhmL9onyz79/VHwXRX13rPwO+GmtO0r+Hls5XOS9lK0P8A46p2/pXPyfsy+A2bMep62g9PPjP80rT2iPl6nC2Ni/dcWvX/ADR8yUAFmCKCWY4UAZJPoB3r6jtP2bfh3bsGnfVrrHVZbvaD/wB8KK7Tw98PvBfhVhJoPhyztZR/y22b5f8Avtst+tDqLoaUeFMXN/vZKK+9/wBfM8C+G3wE1vxHPFqvi2CbTNKBDeQ4K3FyPTHWNT6nn0HevpexsrTTbOGwsLeOC2t0EcUUa4VFAwABU9FZSk5bn1+XZZQy2HLSWr3b3YUUUVJ6IUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFIaAFor5C8fftA/FTw38RNd0rT9fjNhpuqSxRWzWcJBiR+ELbd3IGM5zzX0q3xB0Bfh8fiP5/wDxLP7P+3jn5sbc+X/vbvkx61KkmU4tHUUV8ifDv4//ABT8S/EbQtI1PX4vsGo6kkU1stnCAI2JOwNt3ccDOc8V9aXl5bafZzX97MkNvbxtLLI5wqIoyzH2ABNEZKWwSi47k9J16V8vXnxl+MHxe8S3Oi/CC1On6db/ADecUjEnl5wJJZJAVj3Y4RRn64OIrv4lfH/4L6rZt8Ro01nSbp9uWMbCTHURzIoKuBkhXGD+oXOh8jPqeis3w54g0vxVoVl4i0afzrLUIVmhYjBwexHYg5BHYg186fGH46fEHwF8W7rSNJ1KKTSLL7LKbGS3jIkVo1Z1Mm3eM5POeP0puSiriUW3Y+naK5fSfG2m+LfAjeMPDd1uils5ZUyBuilVDlHHZlYYI9vQ15t+zH8SvGfxEg19/F+rLfGy+yeRi3ji271kLfcAznaOvpT5thcrtc9xoryD9pPx94r+H/hrSdQ8J6mLKe5vzBK5gSXcnlO2MOCByBXoHgHVL7W/BGgaxqU3m3d7pttcTybQu6RowWOBwMkngUc2tgtpc36K+WvGnij9qjwRp114g1zUra10yKcRiRUspCA77U+VQT3FWPAniL9qXxlbaX4j0/ULa50W6uV3yFLOMtEsu2T5SAw4Vvf0qefpYrk63Pp2kyB1rG8YeK9K8EeG77xPrcjLa2Me9gvLOxOFRR3ZmIA+tfOOm+Pf2i/jNd3V/wCBTFo2k28hQeWY441OPuGV1ZpHxjO0ADPQZpuSQlG+p9UUV8xaJ8bvij8LvFcHhf40Wv2mzn2n7V5aCSOMnHmo8YCyoD94Y3D68H6ajljmjWaF1dHAZWU5BB6EGhSuJxsPor5Rb4nfH7xP8Rte8HeCNchlaxvLvyYXt7ZAkEU2wfM684yo5OTVi8+M/wAdvhTr1jB8UrC1u7G7+cr5UQZ4gQHMckJxuXI4Ydx65pc6K5GfU1FRwTxXMEdzA26OVVdD6qRkH8jXgnwu+KXjnxH8b9e8H6xrKz6TZNqAgg+zRqV8qcKnzBQxwDjk81TdiUrnv9FcP8avEms+EfhnrPiHw/di2v7RYTDKY1fbumRT8rAg8E9RXnH7Pvx81Dxhfy+EPHV9FJqspMun3XlrELhQMtEQoA3jBI9RnuOU5JOw1FtXPf6K8B/aG+KXjnwL4v8AD+l+F9ZWztb633zobaOTefOC5yykjg44r32mnd2E1ZXFpMg9DXzV47+Pfjvxb4wk8CfBe0LGKR4TeRxLJLOynDspf5I4geNx69cjIzBBqf7WPgfULGbVLVtct7y4jg8l/JuI9zEABniAeIc/e+6O9TzroVyM+naKZCZWiQzoqyFRvVWyA2OQDgZGfairIH0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFIelLSGgD4rvfBi+Pvjv4z8MKdtxcS6pJatnAW4T5oyfbIwfYmuVHjjxS/gRfhCLaUx/2v5wi58wvnAtsennfN9a+j/CXwa8XaJ8dNT+I15Npx0q7nvZI1jnYzYlHy5XaAPfmuhT4CeGU+Kp+KAu5d5lN0NP8tfKFztx5u7rnPzY/vc1jyNm3OkfPum+DU8A/H7wf4WzumtZNOe6cHIe4eMtIR7bjgewFfTXxsgvbn4TeKYtPDGY6ZKcL1KAAv/46Grh/E/wb8W6v8eNO+JFpNpw0m1mtJHV52E2Ikw2F2469Oa9teNJY2ilRXRgVZWGQQeoIqoxtdEylezPAv2Pr3R28H6zYwNGNSTUvOuB/EYWjURt/u/K4+ua6L9qO80iD4TXttqDR/abq5t0sVP3jMJAxK/RA+fb61x/if9mnxT4f8RyeJ/g34nXS/MLFbWSZ4WhDdUSRQQyeiuOOOTiqth+zj8SfG2tW+p/F7xr9otrfjyobhppmTOSinaqRA9yAT/OlrblsPRvmud9+y/Dew/CDTWuwwSW5upIN3/PIytjHtkMa8g+J+iaf4k/akj0DVYjJZ6hLZW8yq20lWtuxHQjgj3FfV+m6bY6Pp9tpWmWsdtaWkSwwRIMKiKMAD8K8Z8Q/Bvxdqnx8s/iXbTacNIguLWV1edhNiOLY2F2469Oaco6JCjLVs8p0bV/EH7O3jHWPA3iJ5bjQdXgkAkVSQ6shWK6QevRXUeh9Fz1v7F4K2/itT1BsQf8AvmWvWvjF8K7H4o+F204mODVbPMunXTDiOTHKNjnY2MH8D1Fc1+zz8JvFPwuTXR4llsHOpG2MP2WZpMbA+7dlVx94UKLUvIHJOL7mF+2L/wAiboX/AGFT/wCiHr1f4Wf8k18Lf9ge0/8ARS1yn7QPwz8RfE7w9pml+HJLJJrS9NxIbqVo12+Wy8EK3OSK7nwRo934e8HaJoV+Yzc6fp9vazGNiULogU4JAyMj0ppPmbJb92x5/wDtR/8AJIdQ/wCvuz/9HLVv9mr/AJI1oP8AvXX/AKUSVq/GvwTrHxA8A3fhrQntlu5p7eRTcSFEwkgY5IBPQelT/B3whqvgT4e6Z4X1t7dryzM5kNu5dPnldxgkAnhh2ot71wv7tji/2sobqT4WxyQKxih1W2e4wOiYcAn23lf0rb/ZxvNKufhBoUemPHutkkhulXGVuBIxfd7nIb6EV32u6JpniTSLvQtZtEubK+iaGeJujKf5HuCOQQDXznN+zv8AFjwJqlzc/CjxyEs7k8pJcNby7ewkG1o3I6bsA+wod1K41Zqxa/bJvNJ/svw5YO0baiLiedVB+Zbfy8MT6Att+pU+le2fDaC9tvh74at9SDC5j0q0WUN1DCJeD71494L/AGatdvvEqeL/AIveI01i4R1lFqkrzeay/dEsjAfKP7ijB9cZB+hcYGBRFO7bCTVrI+J9G8WeKPBvxr8U6v4R8NnW75rzUYTbCKSQiNrjJfEfPBUD05p+qa/44/aX8a6X4bu7fTtONoso8pGKCGMlfOc7zudwAPlHp0HJr2j4bfBzxb4T+MGueOtUm046bqJvfJWGdmlHmzK6blKgDgc89az/AIm/AHxNefEC3+IPwuv7HTr1pBdXCTyNGEuVP+sXapBDjO5T1567jUcrsXzK57xaWsVlaQ2cIPlwRrGueuFAA/QV8t/BL/k5XxR/v6r/AOlK19P6S+py6ZayazbwQXzRKbiOCQvGsmPmCsQCVz0yBxXjXw4+DXi7wp8Yta8d6nNpzabqDXxiWKdmlHnTB0ypUAcDnmrkr2M49Tpf2j/+SM+Iv9y3/wDSiOvmux+GGoXnwjsPip4UadNS0i8uTerCx3+VHLlJ09Gj746rz/Dz9XfF7wnqnjj4eat4X0Vrdby9WIRGdyifLKjHJAJHCntVD4J+BNY8AeAovDPiFrSS5W5uJW+zuZIyrtkDJA7deKUo80ioy5Ynyr8RviW3xOvPCGp3kYj1OxgFpfhVwjSeepEi+zDnHY5HpX25rUd1Lo19FYk/aHtpVhx13lDt/XFfN3jf9lXXJPGb6r4Fn0yLR5pkuRbXMzRtbtvy6LhSCnGV5GM47Zr6eogmm7hNqysfK/7HFxpkGueIrK72rqklrbmEPw5jRn80D6MUyPpXsnxv+JmpfC7wzZ65pWm2t9Jc362jJcOyqFMbtkFec/KK4b4k/s26je+JX8bfC/XE0fUZJTcSW7SPEqzH70kUiAlC2eVIxknpnFc5L8Afjl46nt7X4h+PIv7PgkD/AD3b3JU9CyRhVXdgnkmkuaKtYbtJ3ufQHgPxJc+LPBmi+Jru2igm1OzjuZIoySqFhnAJ5xRVzwz4dsfC3h7TvDenvK9tptultE0rZdlUYyT60VottTJn/9k=';
+  doc.addImage('data:image/jpeg;base64,' + logoB64, 'JPEG', margin, 10, 50, 21);
+
+  // ── HEADER BAR ────────────────────────────────────────
+  doc.setFillColor(...aqua);
+  doc.rect(0, 36, pageW, 10, 'F');
+  doc.setTextColor(...white);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Arc Monitoring – CCTV Monitoring Quote', margin, 43);
+
+  // Ref + date top right
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  const quoteRef = getQuoteRef();
+  const quoteDate = document.getElementById('quoteDate').value || '—';
+  doc.text(quoteRef, pageW - margin, 13, { align: 'right' });
+  doc.text(quoteDate, pageW - margin, 19, { align: 'right' });
+
+  // ── INTRO TEXT ────────────────────────────────────────
+  let y = 52;
+  doc.setTextColor(...dark);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+
+  const custName = document.getElementById('custName').value || 'Customer';
+  doc.text(`Dear ${custName},`, margin, y); y += 6;
+
+  const intro = [
+    'Thank you for your enquiry regarding CCTV monitoring.',
+    '',
+    'All systems are continuously monitored from our advanced NSI Gold Category II control centre, operating 24/7 in Bristol.',
+    'Arc provides a second-to-none monitoring service to protect your site and the wider community. We hold Approved Contractor',
+    'status from the Security Industry Authority as well as Secured by Design approval.',
+    '',
+    'We pride ourselves in offering the very best customer service; all our control room staff hold SIA licenses and undergo',
+    'regular training. We are a Real Living Wage supporter. Our team really cares about protecting the sites they monitor.',
+    '',
+    'We have been monitoring CCTV systems for over 25 years and have developed state-of-the-art bespoke reporting tools.',
+  ];
+  intro.forEach(line => { doc.text(line, margin, y); y += 4.5; });
+
+  // ── INCLUDED SERVICES BOX ─────────────────────────────
+  y += 2;
+  doc.setFillColor(...lightAqua);
+  doc.rect(margin, y, contentW, 34, 'F');
+  doc.setTextColor(...aqua);
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Our bespoke monitoring service includes, free of charge:', margin + 4, y + 6);
+  doc.setTextColor(...dark);
+  doc.setFont('helvetica', 'normal');
+  const included = [
+    'Site commissioning, including Walk Test and Lighting Report',
+    'On-going Technical Support',
+    "Daily 'ping' of the site connection",
+    'Detailed site activity reports by 08:15',
+    'Incident Reports, including images for all critical events',
+    'No additional charges for high alarm rates',
+  ];
+  const col1 = included.slice(0, 3);
+  const col2 = included.slice(3);
+  col1.forEach((item, i) => { doc.text('• ' + item, margin + 4, y + 12 + i * 5); });
+  col2.forEach((item, i) => { doc.text('• ' + item, margin + contentW / 2, y + 12 + i * 5); });
+  y += 38;
+
+  // ── CUSTOMER DETAILS TABLE ────────────────────────────
+  y += 4;
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...aqua);
+  doc.text('Customer Details', margin, y); y += 3;
+
+  const custType = document.querySelector('input[name="custType"]:checked').value;
+  const custTypeLabel = custType === 'installer' ? 'Installer' : 'End User';
+
+  doc.autoTable({
+    startY: y,
+    margin: { left: margin, right: margin },
+    tableWidth: contentW,
+    head: [],
+    body: [
+      ['Name', document.getElementById('custName').value || ''],
+      ['Company Name', document.getElementById('custCompany').value || ''],
+      ['Customer Type', custTypeLabel],
+      ['Email Address', document.getElementById('custEmail').value || ''],
+      ['Phone Number', document.getElementById('custPhone').value || ''],
+      ['Preferred Billing Frequency*', document.getElementById('billingFreq').value || ''],
+    ],
+    styles: { fontSize: 9, cellPadding: 3, textColor: dark },
+    columnStyles: {
+      0: { fontStyle: 'bold', fillColor: lightAqua, cellWidth: 60, textColor: grey },
+      1: { fillColor: white }
+    },
+    theme: 'plain',
+    didParseCell: (data) => {
+      data.cell.styles.lineWidth = 0.2;
+      data.cell.styles.lineColor = [220, 224, 224];
+    }
+  });
+  y = doc.lastAutoTable.finalY + 5;
+
+  // ── FOOTNOTE ─────────────────────────────────────────
+  doc.setFontSize(7.5);
+  doc.setTextColor(...grey);
+  doc.setFont('helvetica', 'italic');
+  doc.text('*Please note that all monthly or quarterly invoices must be paid via direct debit. Credit is limited to 30 days.', margin, y);
+  y += 8;
+
+  // ── QUOTE DETAIL SECTION ──────────────────────────────
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...aqua);
+  doc.text('Quote Detail', margin, y); y += 3;
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...dark);
+  doc.text('If you are happy with this quote, just reply to accept. If you would like to discuss further, don\'t hesitate to reach out to your account manager.', margin, y, { maxWidth: contentW });
+  y += 8;
+  doc.text('Please find below the details of your bespoke quote*.', margin, y); y += 3;
+
+  // Gather all values
+  const monCam = parseInt(document.getElementById('monCameras').value) || 0;
+  const viewCam = parseInt(document.getElementById('viewCameras').value) || 0;
+  const boundaryEl = document.getElementById('siteBoundary');
+  const boundaryOpt = boundaryEl.options[boundaryEl.selectedIndex];
+  const boundaryCost = parseFloat(boundaryOpt.getAttribute('data-cost')) || 0;
+  const monCost = getMonitoredCameraPrice(monCam);
+  const viewCost = getViewCameraPrice(viewCam);
+  const armCost = getSelectCost('armDisarm');
+  const audioCost = getSelectCost('audio');
+  const epatrolCost = getEpatrolAnnualCost();
+  const aiCost = getSelectCost('ai');
+  const scriptCost = getSelectCost('scripting');
+  const tempCost = getSelectCost('tempFire');
+  const r1Cost = getSelectCost('report1');
+  const r2Cost = getSelectCost('report2');
+  const r3Cost = getSelectCost('report3');
+  const subtotal = boundaryCost + monCost + viewCost + armCost + audioCost + epatrolCost + aiCost + scriptCost + tempCost + r1Cost + r2Cost + r3Cost;
+  const discountRate = parseFloat(document.getElementById('discount').value) || 0;
+  const discountAmt = subtotal * discountRate;
+  const total = subtotal - discountAmt;
+
+  const getSelVal = (id) => {
+    const s = document.getElementById(id);
+    return s.options[s.selectedIndex].value;
+  };
+
+  const quoteRows = [
+    ['Quote Ref', quoteRef, ''],
+    ['Quote Date', quoteDate, ''],
+    ['Type of Site', document.getElementById('siteType').value, ''],
+    ['Type of Site Boundary', boundaryOpt.value, fmt(boundaryCost)],
+    [`Number of Monitored Cameras, with detection`, monCam.toString(), fmt(monCost)],
+    [`Number of 'View Only' Cameras`, viewCam.toString(), fmt(viewCost)],
+    ['How will the site be armed and disarmed?', getSelVal('armDisarm'), fmt(armCost)],
+    ['Site wide or individual audio systems', getSelVal('audio'), fmt(audioCost)],
+    ['Additional Services', '', ''],
+    ['E-Patrols per night', getSelVal('epatrols'), fmt(epatrolCost)],
+    ['AI – Alarm filtering', getSelVal('ai'), fmt(aiCost)],
+    ['Specific situational response required', getSelVal('scripting'), fmt(scriptCost)],
+    ['CCTV Temperature or Fire Monitoring', getSelVal('tempFire'), fmt(tempCost)],
+    ['Reporting', '', ''],
+    ['Daily Site Activity Reporting', getSelVal('report1'), fmt(r1Cost)],
+    ['Additional Reporting', getSelVal('report2'), fmt(r2Cost)],
+    ['Additional Reporting', getSelVal('report3'), fmt(r3Cost)],
+    ['Sub Total', '', fmt(subtotal)],
+    ['Discount Code Applied', discountRate > 0 ? (discountRate * 100) + '%' : 'None', discountRate > 0 ? '–' + fmt(discountAmt) : ''],
+    ['Total Quoted Fee', '', fmt(total)],
+  ];
+
+  doc.autoTable({
+    startY: y,
+    margin: { left: margin, right: margin },
+    tableWidth: contentW,
+    head: [['Quote Breakdown', 'Detail', 'Fee**']],
+    body: quoteRows,
+    styles: { fontSize: 8.5, cellPadding: 3, textColor: dark },
+    headStyles: { fillColor: aqua, textColor: white, fontStyle: 'bold', fontSize: 9 },
+    columnStyles: {
+      0: { cellWidth: 80, textColor: grey },
+      1: { cellWidth: 'auto' },
+      2: { cellWidth: 35, halign: 'right', fontStyle: 'bold' }
+    },
+    theme: 'striped',
+    alternateRowStyles: { fillColor: [248, 252, 252] },
+    willDrawCell: (data) => {
+      // Highlight total row
+      if (data.row.index === quoteRows.length - 1 && data.section === 'body') {
+        data.cell.styles.fillColor = aqua;
+        data.cell.styles.textColor = white;
+        data.cell.styles.fontStyle = 'bold';
+      }
+      // Section header rows (empty fee + empty detail)
+      if (['Additional Services', 'Reporting'].includes(data.row.raw[0]) && data.row.raw[2] === '') {
+        data.cell.styles.fillColor = lightAqua;
+        data.cell.styles.textColor = aqua;
+        data.cell.styles.fontStyle = 'bold';
+      }
+    }
+  });
+  y = doc.lastAutoTable.finalY + 4;
+
+  // ── FOOTNOTES ─────────────────────────────────────────
+  doc.setFontSize(7.5);
+  doc.setTextColor(...grey);
+  doc.setFont('helvetica', 'italic');
+  const footnotes = [
+    '* Any quotation provided to the Customer by Arc shall not constitute an offer and is only valid for a period of 30 Working Days from its date of issue.',
+    '**Fee excludes VAT'
+  ];
+  footnotes.forEach(fn => { doc.text(fn, margin, y, { maxWidth: contentW }); y += 5; });
+
+  // ── CROSS-SELL BOX ────────────────────────────────────
+  y += 2;
+  doc.setFillColor(...lightAqua);
+  doc.rect(margin, y, contentW, 14, 'F');
+  doc.setTextColor(...aqua);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('Did you know?', margin + 4, y + 5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...dark);
+  doc.setFontSize(8.5);
+  doc.text('We also provide Alarm Monitoring, Key Holding, Access Control, and a range of other services to complement your CCTV monitoring.', margin + 4, y + 10, { maxWidth: contentW - 8 });
+  y += 18;
+
+  // ── ADD NEW PAGE FOR T&Cs ─────────────────────────────
+  doc.addPage();
+  y = 20;
+
+  doc.setFillColor(...aqua);
+  doc.rect(0, 0, pageW, 12, 'F');
+  doc.setTextColor(...white);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Other Services Terms and Conditions', margin, 8);
+
+  doc.setTextColor(...dark);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  const tcs = [
+    'A full copy of Arc\'s Terms and Conditions can be found on our website www.arcmon.com',
+    '',
+    'The Charges for Services are as confirmed by Arc in writing. These Charges apply for the Services Initial Term of each End-User Site only.',
+    '',
+    'All Charges quoted to the Customer for the provision of the Services are exclusive of any Value Added Tax ("VAT"), for which the Customer shall be additionally liable, at the applicable rate.',
+    '',
+    'Arc reserves the right to increase the Charges on an annual basis in line with the percentage increase in the Retail Prices Index in the preceding 12-month period.',
+    '',
+    'Arc shall invoice the Customer in advance for the Services monthly, quarterly or annually payable by Direct Debit, unless alternative payment method is agreed in writing by the parties.',
+    '',
+    'The Customer shall pay each invoice submitted by Arc within 30 days of the date of the invoice, in full and cleared funds to the bank account nominated in writing by Arc.',
+    '',
+    'If the Customer fails to make a payment due to Arc under the Contract by the due date, Arc shall be entitled to charge the Customer interest on the outstanding amount from the due date at the rate of 4% above the base rate of the Bank of England.',
+    '',
+    'Without limiting any other rights that Arc may have, if the Customer does not pay Arc on the due date and that payment is outstanding for ten Working Days from the due date, Arc may terminate or suspend its performance of the Services until payment of the outstanding amounts is made.',
+    '',
+    'The Charges are based on the information, instructions and/or descriptions provided by the Customer and/or End-User to Arc in relation to the System and the End-User Site(s). Arc reserves the right to reasonably vary the Charges with immediate effect if it determines that the information provided was inaccurate or incorrect.',
+    '',
+    'The Customer shall be responsible for the payment to Arc of any additional charges incurred as a consequence of additional provision or modification of telephone or other facilities for the transmission of signals to Arc.',
+    '',
+    'If the Customer disputes any part of the invoice and wishes to withhold any amount in relation to any dispute, the Customer must notify Arc of this fact as soon as possible and must set out the disputed amounts and the reasons for disputing them.',
+  ];
+  tcs.forEach(tc => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    const lines = doc.splitTextToSize(tc, contentW);
+    doc.text(lines, margin, y);
+    y += lines.length * 4.5;
+  });
+
+  // ── FOOTER ON ALL PAGES ───────────────────────────────
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(...dark);
+    doc.rect(0, 285, pageW, 12, 'F');
+    doc.setTextColor(...white);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Arc Monitoring Limited | Company Number: 03862866 – Registered in England & Wales', margin, 291);
+    doc.text('Trading Office: 9 Brabazon Office Park, Golf Course Lane, Filton, Bristol, BS34 7PZ', margin, 295);
+    doc.text(`Page ${i} of ${pageCount}`, pageW - margin, 291, { align: 'right' });
+  }
+
+  // ── SAVE ──────────────────────────────────────────────
+  const filename = `Arc_Quote_${getQuoteRef().replace(/[^a-zA-Z0-9-]/g, '_')}.pdf`;
+  doc.save(filename);
+}
+
+// ─── TEMPLATES ───────────────────────────────────────────────────────────────
+
+function toggleTemplatesPanel() {
+  const body = document.getElementById('templatesPanelBody');
+  const btn = document.getElementById('templatesPanelToggle');
+  const arrow = document.getElementById('templatesPanelArrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('open', !isOpen);
+  arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+const TEMPLATE_KEY = 'arcQuoteTemplates';
+const TEMPLATE_FIELDS = [
+  'siteType','siteBoundary','monCameras','viewCameras',
+  'armDisarm','audio','epatrols','ai','scripting','tempFire',
+  'report1','report2','report3','discount'
+];
+
+function getTemplates() {
+  try { return JSON.parse(localStorage.getItem(TEMPLATE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveTemplates(templates) {
+  localStorage.setItem(TEMPLATE_KEY, JSON.stringify(templates));
+}
+
+function saveTemplate() {
+  const name = document.getElementById('templateName').value.trim();
+  const msg = document.getElementById('templateMsg');
+  if (!name) {
+    msg.style.color = '#e05555';
+    msg.textContent = 'Please enter a name for this template.';
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+    return;
+  }
+  const config = {};
+  TEMPLATE_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) config[id] = el.value;
+  });
+  const templates = getTemplates();
+  const existing = templates.findIndex(t => t.name.toLowerCase() === name.toLowerCase());
+  if (existing >= 0) {
+    templates[existing].config = config;
+    msg.style.color = 'var(--aqua-dark)';
+    msg.textContent = `Template "${name}" updated.`;
+  } else {
+    templates.push({ name, config });
+    msg.style.color = 'var(--aqua-dark)';
+    msg.textContent = `Template "${name}" saved.`;
+  }
+  saveTemplates(templates);
+  document.getElementById('templateName').value = '';
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+  renderTemplates();
+}
+
+function loadTemplate(index) {
+  const templates = getTemplates();
+  const t = templates[index];
+  if (!t) return;
+  TEMPLATE_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && t.config[id] !== undefined) el.value = t.config[id];
+  });
+  updateSummary();
+  // Scroll to top of form
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteTemplate(index) {
+  const templates = getTemplates();
+  const name = templates[index]?.name;
+  if (!confirm(`Delete template "${name}"?`)) return;
+  templates.splice(index, 1);
+  saveTemplates(templates);
+  renderTemplates();
+}
+
+function renderTemplates() {
+  const templates = getTemplates();
+  const container = document.getElementById('templatesList');
+  if (!templates.length) {
+    container.innerHTML = '<div class="no-templates">No saved templates yet. Configure a quote and save it above.</div>';
+    return;
+  }
+  container.innerHTML = templates.map((t, i) =>
+    `<div class="template-item">
+      <span class="t-name" title="${t.name}">${t.name}</span>
+      <button class="btn-load" onclick="loadTemplate(${i})">Load</button>
+      <button class="btn-delete" onclick="deleteTemplate(${i})" title="Delete">✕</button>
+    </div>`
+  ).join('');
+}
+
+// Init templates on load
+document.addEventListener('DOMContentLoaded', () => {
+  renderTemplates();
+});
+
+
+// ─── CONTACTS ────────────────────────────────────────────────────────────────
+
+const CONTACT_KEY = 'arcQuoteContacts';
+const CONTACT_FIELDS = {
+  custName:    { type: 'input' },
+  custCompany: { type: 'input' },
+  custEmail:   { type: 'input' },
+  custPhone:   { type: 'input' },
+  billingFreq: { type: 'select' },
+};
+const CONTACT_RADIO = 'custType';
+
+function getContacts() {
+  try { return JSON.parse(localStorage.getItem(CONTACT_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveContactsToStorage(contacts) {
+  localStorage.setItem(CONTACT_KEY, JSON.stringify(contacts));
+}
+
+function saveContact() {
+  // Pre-fill save name from company if blank
+  const nameInput = document.getElementById('contactSaveName');
+  if (!nameInput.value.trim()) {
+    const company = document.getElementById('custCompany').value.trim();
+    if (company) nameInput.value = company;
+  }
+  const name = nameInput.value.trim();
+  const msg = document.getElementById('contactMsg');
+  if (!name) {
+    msg.style.color = '#e05555';
+    msg.textContent = 'Please enter a name for this contact.';
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+    return;
+  }
+  const config = {};
+  Object.keys(CONTACT_FIELDS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) config[id] = el.value;
+  });
+  // Save radio value
+  const radioChecked = document.querySelector(`input[name="${CONTACT_RADIO}"]:checked`);
+  config[CONTACT_RADIO] = radioChecked ? radioChecked.value : 'installer';
+
+  const contacts = getContacts();
+  const existing = contacts.findIndex(c => c.name.toLowerCase() === name.toLowerCase());
+  if (existing >= 0) {
+    contacts[existing].config = config;
+    msg.style.color = 'var(--aqua-dark)';
+    msg.textContent = `Contact "${name}" updated.`;
+  } else {
+    contacts.push({ name, config });
+    msg.style.color = 'var(--aqua-dark)';
+    msg.textContent = `Contact "${name}" saved.`;
+  }
+  saveContactsToStorage(contacts);
+  nameInput.value = '';
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+  renderContacts();
+}
+
+function loadContact(index) {
+  const contacts = getContacts();
+  const c = contacts[index];
+  if (!c) return;
+  Object.keys(CONTACT_FIELDS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el && c.config[id] !== undefined) el.value = c.config[id];
+  });
+  // Restore radio
+  if (c.config[CONTACT_RADIO]) {
+    const radio = document.querySelector(`input[name="${CONTACT_RADIO}"][value="${c.config[CONTACT_RADIO]}"]`);
+    if (radio) radio.checked = true;
+  }
+  // Pre-fill the save name box with company name for convenience
+  const saveBox = document.getElementById('contactSaveName');
+  if (saveBox && c.config.custCompany) saveBox.value = c.config.custCompany;
+}
+
+function deleteContact(index) {
+  const contacts = getContacts();
+  const name = contacts[index]?.name;
+  if (!confirm(`Delete contact "${name}"?`)) return;
+  contacts.splice(index, 1);
+  saveContactsToStorage(contacts);
+  renderContacts();
+}
+
+function renderContacts() {
+  const contacts = getContacts();
+  const container = document.getElementById('contactsList');
+  if (!contacts.length) {
+    container.innerHTML = '<div class="no-templates">No saved contacts yet. Fill in customer details and save above.</div>';
+    return;
+  }
+  container.innerHTML = contacts.map((c, i) =>
+    `<div class="template-item">
+      <span class="t-name" title="${c.name}">${c.name}</span>
+      ${c.config.custCompany && c.config.custCompany !== c.name
+        ? `<span style="font-size:11px;color:var(--grey);flex-shrink:0;">${c.config.custCompany}</span>` : ''}
+      <button class="btn-load" onclick="loadContact(${i})">Load</button>
+      <button class="btn-delete" onclick="deleteContact(${i})" title="Delete">✕</button>
+    </div>`
+  ).join('');
+}
+
+function toggleContactsPanel() {
+  const body = document.getElementById('contactsPanelBody');
+  const btn = document.getElementById('contactsPanelToggle');
+  const arrow = document.getElementById('contactsPanelArrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('open', !isOpen);
+  arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+// Init contacts on load
+document.addEventListener('DOMContentLoaded', () => {
+  renderContacts();
+  // Auto-populate save name from company field
+  document.getElementById('custCompany')?.addEventListener('input', function() {
+    const saveBox = document.getElementById('contactSaveName');
+    if (saveBox && !saveBox.value.trim()) saveBox.value = this.value;
+  });
+});
+
+</script>
+</body>
+</html>
