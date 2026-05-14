@@ -1,29 +1,84 @@
 {
-  "_comment": "Arc Monitoring – CCTV Quote Tool Pricing Config. Edit via admin.html or directly here. All prices in GBP per year unless noted.",
+  "_comment": "Arc Monitoring – CCTV Quote Tool Pricing Config. Edit via admin.html. All prices in GBP per year.",
   "lastUpdated": "2026-05-14",
   "updatedBy": "",
+  "_updateNotes": "Closed site now £90",
   "monitoredCameras": {
-    "t1": { "label": "1–2 cameras",    "pricePerCam": 150 },
-    "t2": { "label": "3–5 cameras",    "pricePerCam": 125 },
-    "t3": { "label": "6–10 cameras",   "pricePerCam": 100 },
-    "t4": { "label": "11–19 cameras",  "pricePerCam": 90  },
-    "t5": { "label": "20–29 cameras",  "pricePerCam": 80  },
-    "t6": { "label": "30–39 cameras",  "pricePerCam": 60  },
-    "t7": { "label": "40–100 cameras", "pricePerCam": 50  },
-    "t8": { "label": "101–150 cameras","pricePerCam": 40  },
-    "t9": { "label": "151–200 cameras","pricePerCam": 30  },
-    "t10":{ "label": "201–250 cameras","pricePerCam": 20  },
-    "t11":{ "label": "251+ cameras",   "pricePerCam": 10  }
+    "t1": {
+      "label": "1–2 cameras",
+      "pricePerCam": 150
+    },
+    "t2": {
+      "label": "3–5 cameras",
+      "pricePerCam": 125
+    },
+    "t3": {
+      "label": "6–10 cameras",
+      "pricePerCam": 100
+    },
+    "t4": {
+      "label": "11–19 cameras",
+      "pricePerCam": 90
+    },
+    "t5": {
+      "label": "20–29 cameras",
+      "pricePerCam": 80
+    },
+    "t6": {
+      "label": "30–39 cameras",
+      "pricePerCam": 60
+    },
+    "t7": {
+      "label": "40–100 cameras",
+      "pricePerCam": 50
+    },
+    "t8": {
+      "label": "101–150 cameras",
+      "pricePerCam": 40
+    },
+    "t9": {
+      "label": "151–200 cameras",
+      "pricePerCam": 30
+    },
+    "t10": {
+      "label": "201–250 cameras",
+      "pricePerCam": 20
+    },
+    "t11": {
+      "label": "251+ cameras",
+      "pricePerCam": 10
+    }
   },
   "viewOnlyCameras": {
-    "t1": { "label": "1 camera",      "pricePerCam": 50 },
-    "t2": { "label": "2–3 cameras",   "pricePerCam": 40 },
-    "t3": { "label": "4–5 cameras",   "pricePerCam": 35 },
-    "t4": { "label": "6–7 cameras",   "pricePerCam": 30 },
-    "t5": { "label": "8+ cameras",    "pricePerCam": 25 }
+    "t1": {
+      "label": "1 camera",
+      "pricePerCam": 50
+    },
+    "t2": {
+      "label": "2–3 cameras",
+      "pricePerCam": 40
+    },
+    "t3": {
+      "label": "4–5 cameras",
+      "pricePerCam": 35
+    },
+    "t4": {
+      "label": "6–7 cameras",
+      "pricePerCam": 30
+    },
+    "t5": {
+      "label": "8+ cameras",
+      "pricePerCam": 25
+    }
   },
   "siteBoundary": {
-    "closed": { "label": "Closed – Clear border", "price": 95  },
-    "open":   { "label": "Open – Arc discretion", "price": 155 }
+    "closed": {
+      "label": "Closed – Clear border",
+      "price": 90
+    },
+    "open": {
+      "label": "Open – Arc discretion",
+      "price": 155
+    }
   }
 }
